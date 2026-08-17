@@ -1,0 +1,30 @@
+[package]
+name = "semantic-gate"
+description = "A thin serving layer between a DWH and its consumers, executing semantic queries over a closed modifier vocabulary."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[lints]
+workspace = true
+
+# Test environments, selected explicitly. A scenario whose environment is not
+# requested is not compiled, so it can never be silently skipped.
+# See docs/spec/environments.md.
+[features]
+default = []
+env-service = []
+env-ch-local = []
+env-mariadb-ro = []
+
+[dependencies]
+axum = "0.8.9"
+clap = { version = "4.6.6", features = ["derive"] }
+semantic-gate-core = { path = "../semantic-gate-core" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_path_to_error = "0.1.20"
+serde_yaml_ng = "0.10.0"
+tokio = { version = "1.53.1", features = ["rt-multi-thread", "macros", "net", "signal"] }
