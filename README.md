@@ -8,14 +8,7 @@ Semantic queries over a closed, parameterised modifier vocabulary — so a catal
 of *N* metrics and *M* modifiers replaces *N×M* hand-written definitions, and
 every composition is decidable before a single row is read.
 
-[![CI](https://github.com/Oberonhive/semantic-gate/actions/workflows/ci.yml/badge.svg)](https://github.com/Oberonhive/semantic-gate/actions/workflows/ci.yml)
-[![Docs](https://github.com/Oberonhive/semantic-gate/actions/workflows/docs.yml/badge.svg)](https://oberonhive.github.io/semantic-gate/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-
-[Documentation](https://oberonhive.github.io/semantic-gate/) ·
-[Product brief](prd.md) ·
-[Specification](https://oberonhive.github.io/semantic-gate/spec/overview.html) ·
-[What is proven](https://oberonhive.github.io/semantic-gate/spec/coverage.html)
 
 </div>
 
@@ -24,9 +17,9 @@ every composition is decidable before a single row is read.
 ## Status
 
 **Pre-implementation.** The specification is being derived from the brief, one
-capability at a time; code follows a scenario, never the reverse. The
-[coverage catalog](docs/spec/coverage.md) is the honest answer to "does it
-work" — it is empty today, and it will never claim more than was actually run.
+capability at a time; code follows a scenario, never the reverse. The coverage
+catalog is the honest answer to "does it work" — it is empty today, and it
+will never claim more than was actually run.
 
 ## What it is
 
@@ -87,13 +80,7 @@ built-in RBAC over metrics or rows beyond per-token namespace visibility; a user
 store or LDAP; result caching; dashboards and UI; scheduling and exports;
 telemetry; any write to your warehouse other than an opt-in audit sink.
 
-They are what keeps this service auditable. See [brief §13](prd.md#13-non-goals-объявляются-в-readme).
-
-## Learn more
-
-How a request resolves, the provider model, and the dev loop are in
-[docs/architecture.md](docs/architecture.md); contribution workflow is in
-[CLAUDE.md](CLAUDE.md).
+They are what keeps this service auditable.
 
 ## License
 
