@@ -1,0 +1,3 @@
+{"metrics": ["revenue"], "dimensions": ["channel"],
+ "modifiers": [{"name": "share"}],
+ "viz": {"y": ["share(revenue)"]}}

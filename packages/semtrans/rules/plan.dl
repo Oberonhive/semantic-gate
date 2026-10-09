@@ -1,0 +1,45 @@
+// ============================================================================
+// SEAM 3 of 3 — the plan out. A query is answered with a chain of nodes (CTEs,
+// the last one is the final SELECT), the output columns with their
+// provenance, or refusals. `src/render.ts` prints these relations as SQL and
+// turns the first refusal into a thrown `Refusal`; nothing else leaves the
+// rules, and no layer prints SQL clauses itself — it only fills these.
+//
+// Fragments in `ncol` and friends are complete SQL expressions. A node's
+// clauses are rendered in this order: SELECT (ncol by ord) FROM nfrom, njoin
+// (by ord, each with its `njoin_on` conditions ANDed), WHERE (nwhere by ord,
+// ANDed), GROUP BY, HAVING (ANDed), ORDER BY (by ord), LIMIT, nsuffix. Aliases
+// in `ncol` are bare identifiers; the renderer quotes them.
+// ============================================================================
+.decl node(name:symbol, seq:number)                      // node order; the highest seq is the final SELECT
+.decl ncol(node:symbol, at:number, alias:symbol, expr:symbol)
+.decl nfrom(node:symbol, text:symbol)                    // a table, a parenthesised subquery, or a node name, with alias
+.decl njoin(node:symbol, at:number, text:symbol)        // "LEFT JOIN t AS c"
+.decl njoin_on(node:symbol, at:number, seq:number, cond:symbol)
+.decl nwhere(node:symbol, at:number, cond:symbol)
+.decl ngroup(node:symbol, at:number, expr:symbol)
+.decl nhaving(node:symbol, at:number, cond:symbol)
+.decl norder(node:symbol, at:number, expr:symbol)       // "d0 ASC NULLS LAST"
+.decl nlimit(node:symbol, n:number)
+.decl nsuffix(node:symbol, text:symbol)                  // e.g. ClickHouse SETTINGS
+
+// The response columns, in order: the final node's SELECT list, with provenance.
+// `modifier` and `grain` are "" when absent.
+.decl ocol(at:number, name:symbol, role:symbol, member:symbol, modifier:symbol, value_type:symbol, grain:symbol)
+
+// A refusal of the closed taxonomy; several may hold, the renderer reports the first by severity.
+.decl refusal(code:symbol, message:symbol, hint:symbol)
+
+.output node
+.output ncol
+.output nfrom
+.output njoin
+.output njoin_on
+.output nwhere
+.output ngroup
+.output nhaving
+.output norder
+.output nlimit
+.output nsuffix
+.output ocol
+.output refusal

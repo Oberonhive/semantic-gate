@@ -1,0 +1,112 @@
+# The shop cube set as a cube.dev data model (YAML). `shop_customers` has no
+# measures: it is a join target whose dimensions the `shop` cube exposes.
+cubes:
+  - name: shop
+    description: Orders of a synthetic online shop, 2024–2025.
+    sql_table: orders
+
+    joins:
+      - name: shop_customers
+        sql: "{CUBE}.customer_id = {shop_customers}.customer_id"
+        relationship: many_to_one
+
+    measures:
+      - name: revenue
+        type: sum
+        sql: "{CUBE}.revenue"
+        description: Gross order revenue.
+        title: Revenue
+        format: currency
+        meta: {unit: USD, good_when: up}
+      - name: orders
+        type: count
+        description: Number of orders.
+        title: Orders
+        meta: {format: number, decimals: 0, good_when: up}
+      - name: units
+        type: sum
+        sql: "{CUBE}.quantity"
+        description: Units sold.
+        title: Units
+        meta: {format: number, decimals: 0, value_type: integer}
+      - name: customers
+        type: count_distinct
+        sql: "{CUBE}.customer_id"
+        description: Distinct ordering customers.
+        title: Customers
+        meta: {format: number, decimals: 0, good_when: up}
+      - name: margin
+        type: sum
+        sql: "{CUBE}.revenue - {CUBE}.cost"
+        description: Revenue minus cost.
+        title: Margin
+        format: currency
+        meta: {unit: USD, good_when: up}
+      - name: aov
+        type: number
+        sql: "{revenue} / NULLIF({orders}, 0)"
+        description: Average order value.
+        title: Average order value
+        format: currency
+        meta: {unit: USD, good_when: up}
+      - name: margin_pct
+        type: number
+        sql: "{margin} / NULLIF({revenue}, 0)"
+        description: Margin as a share of revenue.
+        title: Margin %
+        format: percent
+        meta: {decimals: 1, good_when: up}
+      - name: return_rate
+        type: avg
+        sql: "{CUBE}.returned"
+        description: Share of orders returned.
+        title: Return rate
+        format: percent
+        meta: {decimals: 1, good_when: down}
+
+    dimensions:
+      - name: period
+        type: time
+        sql: "{CUBE}.order_date"
+        description: Order date, truncated to the `time_grain` parameter (default month).
+        title: Period
+        meta: {default_grain: month}
+      - name: region
+        type: string
+        sql: "{CUBE}.region"
+        description: Sales region.
+        title: Region
+        meta: {order: [EU, North America, APAC, LATAM]}
+      - name: country
+        type: string
+        sql: "{CUBE}.country"
+        description: ISO 3166-1 alpha-2 country of the customer.
+        title: Country
+        meta: {kind: geo}
+      - name: channel
+        type: string
+        sql: "{CUBE}.channel"
+        description: Sales channel.
+        title: Channel
+        meta: {colors: {web: "#4e79a7", app: "#f28e2b", retail: "#59a14f", partner: "#b07aa1"}}
+      - name: category
+        type: string
+        sql: "{CUBE}.category"
+        description: Product category.
+        title: Category
+      - name: customer
+        type: number
+        sql: "{CUBE}.customer_id"
+        description: One customer.
+        title: Customer
+        meta: {kind: entity, value_type: integer}
+
+  - name: shop_customers
+    sql_table: customers
+
+    dimensions:
+      - name: segment
+        type: string
+        sql: "{CUBE}.segment"
+        description: Customer segment.
+        title: Segment

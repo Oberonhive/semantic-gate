@@ -4,7 +4,8 @@ description = "Sans-io contract types shared by every host of the semantic-gate 
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license-file.workspace = true
+publish.workspace = true
 repository.workspace = true
 authors.workspace = true
 
@@ -13,3 +14,4 @@ workspace = true
 
 [dependencies]
 serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"

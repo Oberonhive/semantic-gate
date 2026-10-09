@@ -1,0 +1,1501 @@
+customer_id,signup_date,segment,region,country
+1,2024-11-25,consumer,EU,FR
+2,2023-11-30,consumer,EU,FR
+3,2025-07-25,consumer,EU,ES
+4,2024-12-24,business,EU,GB
+5,2024-06-22,consumer,EU,DE
+6,2025-03-22,consumer,EU,GB
+7,2024-10-22,consumer,LATAM,CO
+8,2024-08-29,business,EU,ES
+9,2025-04-17,consumer,EU,DE
+10,2024-08-26,consumer,EU,DE
+11,2025-07-15,consumer,APAC,AU
+12,2025-08-15,business,LATAM,CL
+13,2024-03-18,consumer,APAC,JP
+14,2023-09-30,business,North America,MX
+15,2023-12-13,business,EU,ES
+16,2024-03-07,consumer,EU,ES
+17,2023-11-17,consumer,North America,CA
+18,2024-09-08,business,EU,NL
+19,2025-06-18,business,APAC,IN
+20,2024-01-19,consumer,EU,DE
+21,2025-03-25,business,EU,DE
+22,2025-02-08,consumer,North America,CA
+23,2025-02-28,consumer,LATAM,BR
+24,2023-11-05,consumer,APAC,JP
+25,2023-09-15,consumer,North America,CA
+26,2024-09-15,consumer,North America,CA
+27,2024-04-05,business,LATAM,CO
+28,2024-02-09,consumer,APAC,IN
+29,2025-02-04,consumer,North America,MX
+30,2024-03-22,consumer,EU,NL
+31,2025-06-17,consumer,APAC,AU
+32,2025-07-13,business,EU,GB
+33,2024-06-25,business,APAC,JP
+34,2023-09-07,consumer,North America,US
+35,2025-04-10,consumer,North America,US
+36,2024-06-02,consumer,North America,US
+37,2024-02-20,consumer,EU,IT
+38,2024-10-03,consumer,EU,DE
+39,2024-12-21,business,North America,CA
+40,2025-04-26,consumer,North America,MX
+41,2025-05-17,business,North America,CA
+42,2025-06-04,consumer,APAC,IN
+43,2024-01-27,consumer,North America,US
+44,2024-02-13,consumer,APAC,IN
+45,2023-11-28,consumer,EU,ES
+46,2024-04-13,consumer,LATAM,BR
+47,2024-02-28,consumer,LATAM,CO
+48,2024-04-10,consumer,EU,GB
+49,2023-09-14,business,APAC,SG
+50,2025-05-02,consumer,North America,CA
+51,2025-08-06,consumer,APAC,IN
+52,2025-06-19,consumer,EU,NL
+53,2024-06-03,consumer,North America,MX
+54,2024-08-04,consumer,North America,MX
+55,2025-04-06,consumer,North America,CA
+56,2024-11-08,consumer,EU,ES
+57,2025-03-16,consumer,North America,US
+58,2024-08-23,consumer,APAC,AU
+59,2025-05-28,business,APAC,AU
+60,2024-10-21,business,APAC,SG
+61,2024-03-31,business,APAC,SG
+62,2024-08-01,business,North America,US
+63,2025-05-14,consumer,EU,ES
+64,2024-07-29,business,EU,PL
+65,2023-11-07,consumer,APAC,SG
+66,2025-05-23,business,EU,NL
+67,2024-11-26,business,LATAM,CL
+68,2023-10-26,consumer,EU,DE
+69,2025-02-06,consumer,APAC,SG
+70,2025-03-10,consumer,LATAM,CO
+71,2025-04-12,consumer,EU,IT
+72,2023-12-13,consumer,North America,CA
+73,2025-07-15,business,EU,PL
+74,2025-04-16,consumer,APAC,AU
+75,2023-09-23,consumer,EU,NL
+76,2024-03-02,consumer,LATAM,CO
+77,2023-11-22,business,APAC,IN
+78,2025-04-21,consumer,North America,CA
+79,2025-03-16,consumer,North America,US
+80,2025-07-17,consumer,LATAM,AR
+81,2024-02-09,consumer,North America,US
+82,2024-02-09,consumer,EU,GB
+83,2024-07-13,consumer,EU,IT
+84,2024-12-11,consumer,North America,CA
+85,2023-12-22,business,EU,FR
+86,2024-07-21,business,EU,DE
+87,2024-08-18,consumer,North America,MX
+88,2023-10-22,consumer,EU,IT
+89,2024-04-28,business,North America,US
+90,2025-04-04,consumer,North America,US
+91,2024-09-30,consumer,North America,MX
+92,2023-09-10,business,APAC,KR
+93,2025-05-26,consumer,APAC,AU
+94,2025-04-23,consumer,APAC,SG
+95,2025-02-04,consumer,APAC,JP
+96,2025-07-20,business,North America,MX
+97,2025-01-03,consumer,APAC,IN
+98,2025-08-25,consumer,APAC,KR
+99,2024-05-28,consumer,North America,US
+100,2025-06-21,consumer,EU,FR
+101,2024-02-02,consumer,APAC,AU
+102,2024-02-06,consumer,North America,US
+103,2024-11-21,consumer,APAC,JP
+104,2024-01-13,consumer,North America,US
+105,2024-12-31,consumer,APAC,JP
+106,2024-05-04,consumer,EU,GB
+107,2024-02-04,business,North America,CA
+108,2024-12-29,business,North America,CA
+109,2025-05-16,consumer,North America,CA
+110,2023-12-13,consumer,North America,MX
+111,2025-02-17,consumer,North America,CA
+112,2024-01-10,consumer,North America,MX
+113,2025-08-26,consumer,APAC,JP
+114,2024-02-28,consumer,APAC,KR
+115,2024-08-04,consumer,North America,CA
+116,2025-07-01,business,EU,IT
+117,2024-09-09,business,North America,MX
+118,2025-04-24,consumer,EU,DE
+119,2024-01-20,consumer,EU,PL
+120,2025-02-12,consumer,EU,FR
+121,2024-04-29,business,APAC,IN
+122,2023-09-27,business,North America,US
+123,2025-04-08,consumer,EU,DE
+124,2024-04-20,consumer,LATAM,CL
+125,2025-03-06,business,EU,DE
+126,2025-06-05,business,North America,CA
+127,2024-01-11,consumer,North America,US
+128,2025-03-01,consumer,North America,MX
+129,2024-06-23,consumer,EU,DE
+130,2025-05-19,consumer,APAC,KR
+131,2024-05-28,business,APAC,AU
+132,2023-11-27,business,North America,US
+133,2025-01-02,consumer,APAC,SG
+134,2025-08-06,consumer,EU,GB
+135,2024-01-10,consumer,EU,PL
+136,2025-05-03,consumer,North America,CA
+137,2024-03-23,consumer,North America,MX
+138,2024-09-17,consumer,North America,CA
+139,2023-10-22,business,APAC,JP
+140,2024-10-08,consumer,APAC,IN
+141,2023-11-24,business,EU,IT
+142,2025-03-14,business,APAC,KR
+143,2025-01-26,consumer,LATAM,CO
+144,2024-11-22,business,EU,GB
+145,2024-04-23,consumer,EU,FR
+146,2024-02-01,consumer,North America,US
+147,2024-12-19,consumer,North America,MX
+148,2024-06-22,consumer,APAC,IN
+149,2025-04-21,consumer,APAC,KR
+150,2024-04-09,consumer,EU,ES
+151,2025-08-01,consumer,North America,MX
+152,2023-11-17,business,APAC,IN
+153,2024-05-25,consumer,APAC,AU
+154,2025-01-03,consumer,EU,FR
+155,2024-10-08,consumer,North America,MX
+156,2024-09-12,consumer,EU,GB
+157,2023-10-13,consumer,North America,MX
+158,2024-04-06,consumer,LATAM,CL
+159,2023-12-10,consumer,EU,DE
+160,2024-02-23,consumer,EU,FR
+161,2023-12-18,consumer,North America,US
+162,2024-01-06,consumer,EU,NL
+163,2024-03-03,business,North America,US
+164,2025-01-13,consumer,North America,MX
+165,2024-04-09,consumer,APAC,KR
+166,2025-07-03,consumer,North America,MX
+167,2024-12-27,consumer,LATAM,CO
+168,2024-02-06,consumer,North America,MX
+169,2023-09-26,consumer,EU,ES
+170,2025-07-03,business,North America,MX
+171,2024-01-06,consumer,EU,ES
+172,2025-06-17,consumer,EU,DE
+173,2025-05-28,business,LATAM,AR
+174,2025-06-07,consumer,EU,IT
+175,2024-09-06,consumer,EU,IT
+176,2023-09-12,consumer,North America,CA
+177,2025-01-02,business,EU,GB
+178,2024-05-29,business,EU,IT
+179,2025-03-14,consumer,APAC,SG
+180,2024-12-12,consumer,North America,CA
+181,2025-03-06,consumer,APAC,SG
+182,2024-08-11,business,EU,DE
+183,2024-10-19,consumer,APAC,KR
+184,2024-05-05,consumer,North America,CA
+185,2023-12-25,consumer,North America,US
+186,2024-03-21,consumer,North America,US
+187,2024-09-19,consumer,APAC,KR
+188,2025-03-03,consumer,APAC,AU
+189,2025-07-06,business,EU,NL
+190,2024-06-10,consumer,North America,CA
+191,2024-10-27,consumer,LATAM,BR
+192,2025-05-16,business,EU,IT
+193,2023-09-24,consumer,EU,ES
+194,2024-04-05,consumer,North America,US
+195,2024-04-29,business,APAC,SG
+196,2024-11-25,consumer,LATAM,CL
+197,2025-05-20,consumer,EU,NL
+198,2025-07-08,consumer,APAC,AU
+199,2024-10-26,consumer,APAC,JP
+200,2024-09-29,consumer,North America,CA
+201,2024-10-31,consumer,EU,DE
+202,2024-09-27,consumer,APAC,IN
+203,2024-01-09,consumer,North America,CA
+204,2024-09-03,business,LATAM,AR
+205,2024-05-11,consumer,LATAM,CL
+206,2024-03-10,consumer,LATAM,AR
+207,2024-04-07,business,EU,GB
+208,2025-05-06,consumer,North America,US
+209,2023-09-15,consumer,EU,DE
+210,2024-03-05,consumer,APAC,KR
+211,2024-03-01,consumer,North America,MX
+212,2025-05-24,consumer,APAC,AU
+213,2025-08-14,consumer,APAC,IN
+214,2024-09-23,consumer,EU,DE
+215,2024-03-30,consumer,APAC,JP
+216,2023-11-01,consumer,North America,CA
+217,2025-03-14,consumer,APAC,JP
+218,2024-06-14,consumer,North America,MX
+219,2024-11-27,consumer,North America,MX
+220,2025-08-24,consumer,EU,DE
+221,2024-12-06,consumer,North America,US
+222,2024-02-27,consumer,North America,CA
+223,2025-08-25,consumer,EU,ES
+224,2024-05-08,consumer,North America,MX
+225,2024-02-08,consumer,North America,CA
+226,2025-07-05,consumer,EU,FR
+227,2023-12-05,consumer,EU,PL
+228,2024-02-20,consumer,North America,US
+229,2023-11-18,business,EU,ES
+230,2024-05-05,business,EU,DE
+231,2025-05-24,consumer,EU,ES
+232,2025-02-22,consumer,EU,FR
+233,2023-09-18,business,North America,CA
+234,2024-03-26,consumer,EU,GB
+235,2024-04-22,business,North America,US
+236,2024-10-20,business,LATAM,AR
+237,2024-01-04,business,APAC,SG
+238,2025-07-29,business,EU,NL
+239,2023-11-25,consumer,EU,FR
+240,2024-07-04,consumer,EU,GB
+241,2023-11-01,consumer,EU,PL
+242,2023-12-26,consumer,EU,ES
+243,2024-12-29,consumer,APAC,SG
+244,2024-03-27,business,APAC,KR
+245,2024-10-31,consumer,North America,CA
+246,2024-01-10,consumer,North America,US
+247,2025-07-18,consumer,North America,US
+248,2024-10-06,consumer,North America,MX
+249,2024-11-23,consumer,EU,NL
+250,2025-01-14,consumer,North America,CA
+251,2024-07-20,consumer,APAC,SG
+252,2025-06-02,consumer,North America,US
+253,2024-07-08,consumer,EU,GB
+254,2025-03-24,business,North America,MX
+255,2025-06-01,consumer,EU,PL
+256,2024-12-15,consumer,EU,DE
+257,2024-09-13,consumer,North America,US
+258,2024-01-12,consumer,LATAM,CO
+259,2023-09-22,consumer,EU,PL
+260,2025-03-26,consumer,North America,CA
+261,2024-07-10,consumer,APAC,SG
+262,2025-08-16,consumer,North America,MX
+263,2025-03-28,consumer,EU,ES
+264,2024-02-07,business,APAC,SG
+265,2023-10-27,consumer,EU,NL
+266,2024-08-25,consumer,LATAM,CL
+267,2023-10-04,business,North America,US
+268,2025-05-04,consumer,LATAM,AR
+269,2023-12-29,consumer,EU,PL
+270,2024-07-08,consumer,EU,FR
+271,2025-03-05,business,North America,US
+272,2024-10-06,business,North America,MX
+273,2024-11-04,consumer,North America,CA
+274,2024-03-31,consumer,North America,MX
+275,2023-11-28,consumer,EU,NL
+276,2023-09-22,consumer,EU,FR
+277,2023-11-15,consumer,North America,CA
+278,2025-04-13,consumer,APAC,AU
+279,2025-02-04,consumer,North America,MX
+280,2024-03-06,consumer,EU,IT
+281,2024-09-04,consumer,North America,MX
+282,2024-08-08,consumer,North America,MX
+283,2024-02-07,business,North America,MX
+284,2024-06-02,consumer,EU,ES
+285,2024-09-05,business,North America,US
+286,2025-07-17,consumer,APAC,JP
+287,2024-12-29,consumer,LATAM,BR
+288,2023-11-25,consumer,LATAM,CL
+289,2024-02-20,business,North America,MX
+290,2025-05-28,business,North America,US
+291,2023-10-02,consumer,North America,MX
+292,2025-03-30,business,EU,GB
+293,2025-07-07,consumer,North America,CA
+294,2025-07-28,consumer,North America,MX
+295,2023-12-04,consumer,North America,US
+296,2024-02-19,consumer,LATAM,CL
+297,2023-12-06,consumer,North America,CA
+298,2025-07-20,consumer,APAC,SG
+299,2024-12-22,consumer,North America,CA
+300,2023-11-08,consumer,APAC,KR
+301,2025-01-26,consumer,North America,CA
+302,2023-12-30,consumer,LATAM,CL
+303,2024-01-12,consumer,North America,CA
+304,2024-07-28,consumer,EU,GB
+305,2023-10-15,consumer,EU,ES
+306,2025-05-07,consumer,EU,GB
+307,2024-11-14,consumer,North America,MX
+308,2025-03-22,consumer,North America,MX
+309,2024-07-05,business,APAC,JP
+310,2023-09-20,consumer,EU,PL
+311,2025-08-12,business,North America,MX
+312,2025-06-24,consumer,LATAM,AR
+313,2024-04-19,business,EU,DE
+314,2025-06-29,consumer,EU,GB
+315,2024-06-24,consumer,EU,NL
+316,2024-03-24,consumer,North America,MX
+317,2023-11-17,consumer,North America,MX
+318,2025-08-18,consumer,EU,IT
+319,2023-09-10,business,EU,IT
+320,2024-03-12,consumer,APAC,IN
+321,2024-02-01,consumer,EU,DE
+322,2024-04-01,business,North America,US
+323,2025-06-04,consumer,North America,US
+324,2024-06-01,consumer,EU,PL
+325,2025-08-09,consumer,LATAM,BR
+326,2025-07-10,business,North America,MX
+327,2024-09-21,consumer,North America,US
+328,2023-10-21,consumer,EU,IT
+329,2024-09-26,consumer,EU,GB
+330,2024-09-21,consumer,North America,CA
+331,2025-01-28,consumer,LATAM,AR
+332,2024-06-25,consumer,North America,CA
+333,2024-05-10,business,North America,MX
+334,2025-06-10,consumer,APAC,KR
+335,2024-02-17,consumer,APAC,KR
+336,2024-08-18,consumer,APAC,IN
+337,2023-09-24,consumer,EU,DE
+338,2024-12-26,business,North America,US
+339,2025-08-01,consumer,EU,ES
+340,2025-04-19,business,North America,US
+341,2024-10-21,business,North America,US
+342,2024-04-10,consumer,EU,NL
+343,2024-09-21,business,APAC,SG
+344,2025-06-26,consumer,LATAM,AR
+345,2025-02-05,consumer,North America,US
+346,2024-07-22,business,North America,US
+347,2024-01-17,consumer,LATAM,CO
+348,2025-07-04,consumer,EU,NL
+349,2024-12-05,consumer,APAC,KR
+350,2025-05-27,business,EU,NL
+351,2025-01-02,business,North America,US
+352,2024-02-28,consumer,APAC,IN
+353,2024-11-13,consumer,EU,DE
+354,2025-05-11,consumer,EU,PL
+355,2024-09-15,consumer,North America,MX
+356,2025-04-08,consumer,North America,MX
+357,2025-07-14,consumer,North America,CA
+358,2024-12-20,consumer,North America,US
+359,2024-03-19,consumer,North America,CA
+360,2024-08-16,consumer,North America,MX
+361,2024-12-19,consumer,EU,DE
+362,2024-05-05,consumer,North America,US
+363,2024-01-03,consumer,EU,ES
+364,2023-09-13,consumer,EU,PL
+365,2024-09-26,business,North America,US
+366,2025-08-16,consumer,APAC,KR
+367,2024-11-28,consumer,APAC,JP
+368,2024-11-29,consumer,North America,US
+369,2024-09-20,business,EU,GB
+370,2025-01-12,business,North America,MX
+371,2025-08-23,consumer,EU,IT
+372,2024-02-05,business,North America,MX
+373,2024-12-28,consumer,EU,ES
+374,2024-01-23,business,North America,CA
+375,2025-08-04,consumer,EU,DE
+376,2024-02-21,consumer,EU,NL
+377,2025-04-29,consumer,North America,CA
+378,2023-10-29,consumer,EU,NL
+379,2024-03-22,business,North America,CA
+380,2025-07-12,consumer,APAC,JP
+381,2024-12-16,consumer,North America,US
+382,2025-08-10,consumer,North America,CA
+383,2023-10-23,consumer,North America,MX
+384,2025-02-02,business,North America,US
+385,2024-10-07,consumer,APAC,AU
+386,2024-05-12,business,LATAM,CO
+387,2024-12-31,consumer,North America,MX
+388,2024-05-24,business,LATAM,CL
+389,2024-10-19,consumer,North America,US
+390,2023-09-29,consumer,EU,FR
+391,2025-01-18,consumer,EU,FR
+392,2023-10-18,consumer,North America,US
+393,2023-09-14,business,North America,US
+394,2025-07-26,consumer,EU,FR
+395,2024-09-03,business,North America,MX
+396,2024-10-21,consumer,LATAM,CL
+397,2025-05-12,consumer,LATAM,CL
+398,2025-02-22,business,EU,PL
+399,2025-03-04,consumer,EU,IT
+400,2024-09-22,consumer,LATAM,AR
+401,2024-12-13,consumer,EU,GB
+402,2025-04-10,consumer,EU,FR
+403,2025-07-12,consumer,EU,FR
+404,2024-03-29,consumer,APAC,IN
+405,2023-10-04,business,LATAM,BR
+406,2024-09-11,business,APAC,JP
+407,2025-03-14,consumer,North America,US
+408,2024-12-10,business,APAC,IN
+409,2024-07-04,business,EU,GB
+410,2023-12-30,consumer,EU,NL
+411,2023-11-17,consumer,APAC,JP
+412,2023-12-17,consumer,EU,IT
+413,2025-04-27,consumer,EU,DE
+414,2023-09-09,consumer,North America,MX
+415,2025-03-16,business,North America,MX
+416,2025-03-03,consumer,LATAM,CO
+417,2024-04-02,consumer,North America,MX
+418,2023-10-04,consumer,APAC,JP
+419,2024-06-02,consumer,LATAM,CO
+420,2024-06-09,consumer,North America,US
+421,2025-05-26,consumer,North America,MX
+422,2025-03-19,consumer,APAC,KR
+423,2023-10-29,business,APAC,IN
+424,2025-06-29,consumer,EU,GB
+425,2024-07-26,consumer,North America,MX
+426,2024-10-28,consumer,EU,ES
+427,2024-03-18,consumer,APAC,SG
+428,2025-05-03,consumer,EU,DE
+429,2024-02-04,consumer,EU,NL
+430,2024-01-06,consumer,North America,MX
+431,2023-12-25,consumer,EU,GB
+432,2025-02-27,consumer,APAC,JP
+433,2024-07-23,consumer,EU,GB
+434,2024-11-23,consumer,EU,PL
+435,2024-11-14,consumer,EU,ES
+436,2024-10-16,consumer,North America,US
+437,2024-01-02,consumer,EU,FR
+438,2025-09-02,consumer,North America,US
+439,2025-07-06,consumer,North America,US
+440,2024-02-26,consumer,North America,CA
+441,2025-02-03,business,EU,DE
+442,2023-09-20,consumer,North America,US
+443,2023-10-21,consumer,APAC,KR
+444,2023-12-12,consumer,North America,US
+445,2024-07-15,consumer,North America,US
+446,2025-06-15,consumer,APAC,JP
+447,2025-01-26,business,North America,MX
+448,2025-05-24,consumer,North America,MX
+449,2025-04-02,consumer,North America,MX
+450,2023-11-25,consumer,EU,NL
+451,2025-01-29,business,EU,FR
+452,2023-10-04,consumer,APAC,IN
+453,2024-06-12,consumer,EU,GB
+454,2025-08-31,consumer,APAC,IN
+455,2024-03-25,business,LATAM,AR
+456,2024-03-03,business,LATAM,CL
+457,2024-08-23,business,EU,DE
+458,2023-10-16,consumer,North America,MX
+459,2025-04-13,consumer,EU,PL
+460,2025-06-26,business,EU,NL
+461,2025-03-01,consumer,North America,CA
+462,2025-02-18,consumer,APAC,JP
+463,2023-10-23,consumer,APAC,KR
+464,2024-05-16,consumer,North America,MX
+465,2023-11-13,consumer,North America,MX
+466,2024-11-04,business,LATAM,CO
+467,2025-06-04,consumer,EU,IT
+468,2024-09-14,consumer,North America,MX
+469,2024-07-27,business,North America,US
+470,2024-05-04,consumer,APAC,AU
+471,2024-05-24,consumer,EU,ES
+472,2025-04-22,consumer,EU,ES
+473,2024-11-27,consumer,North America,MX
+474,2025-04-02,consumer,EU,PL
+475,2024-07-10,consumer,LATAM,BR
+476,2024-11-27,consumer,LATAM,CL
+477,2025-08-11,consumer,EU,FR
+478,2024-07-03,consumer,EU,GB
+479,2024-03-28,consumer,LATAM,CL
+480,2025-07-26,consumer,EU,IT
+481,2025-07-05,business,EU,FR
+482,2023-10-27,consumer,LATAM,CO
+483,2023-09-27,consumer,North America,MX
+484,2024-01-29,consumer,EU,DE
+485,2025-01-21,business,APAC,KR
+486,2024-05-29,consumer,APAC,AU
+487,2025-08-26,consumer,EU,IT
+488,2024-04-12,consumer,EU,PL
+489,2024-02-03,consumer,EU,PL
+490,2025-03-30,consumer,APAC,SG
+491,2025-05-15,consumer,North America,US
+492,2024-04-08,consumer,LATAM,AR
+493,2024-06-23,consumer,EU,PL
+494,2024-12-28,consumer,EU,IT
+495,2024-04-16,consumer,APAC,JP
+496,2023-09-28,consumer,EU,PL
+497,2024-04-05,consumer,EU,FR
+498,2025-05-10,consumer,APAC,AU
+499,2025-08-03,consumer,North America,MX
+500,2025-08-25,business,North America,MX
+501,2024-05-27,business,North America,CA
+502,2024-11-06,consumer,APAC,AU
+503,2024-06-18,business,LATAM,CL
+504,2023-12-27,consumer,North America,MX
+505,2023-10-13,business,APAC,AU
+506,2024-05-22,business,North America,CA
+507,2024-12-16,consumer,North America,MX
+508,2024-06-20,business,LATAM,CO
+509,2025-01-02,consumer,EU,PL
+510,2024-05-12,consumer,LATAM,BR
+511,2023-12-24,consumer,North America,CA
+512,2024-12-25,consumer,LATAM,AR
+513,2025-05-16,business,EU,NL
+514,2023-11-19,business,North America,US
+515,2025-06-16,consumer,North America,US
+516,2024-08-14,consumer,North America,US
+517,2024-12-12,consumer,EU,ES
+518,2024-11-10,business,North America,MX
+519,2023-11-03,consumer,EU,GB
+520,2025-08-11,consumer,EU,ES
+521,2023-11-06,business,North America,CA
+522,2025-05-02,consumer,North America,MX
+523,2023-10-30,consumer,APAC,KR
+524,2024-08-17,consumer,EU,ES
+525,2024-07-26,consumer,North America,MX
+526,2024-03-20,consumer,APAC,JP
+527,2024-11-27,consumer,EU,PL
+528,2025-03-01,consumer,North America,MX
+529,2024-06-13,consumer,North America,MX
+530,2024-08-31,business,EU,DE
+531,2024-06-10,consumer,EU,FR
+532,2024-05-06,consumer,North America,US
+533,2024-11-20,business,EU,PL
+534,2024-03-31,consumer,APAC,IN
+535,2025-05-06,consumer,EU,FR
+536,2024-06-16,consumer,North America,US
+537,2025-04-22,business,EU,PL
+538,2025-04-22,consumer,North America,CA
+539,2024-07-08,consumer,North America,MX
+540,2024-09-24,consumer,North America,US
+541,2025-07-09,consumer,North America,US
+542,2025-05-16,consumer,North America,CA
+543,2024-07-24,consumer,EU,ES
+544,2023-12-11,consumer,LATAM,BR
+545,2025-08-17,consumer,EU,FR
+546,2025-08-25,consumer,North America,MX
+547,2025-07-10,consumer,APAC,KR
+548,2024-05-20,consumer,APAC,SG
+549,2025-01-28,business,APAC,KR
+550,2024-08-04,consumer,North America,MX
+551,2024-09-08,consumer,APAC,IN
+552,2024-02-08,consumer,APAC,IN
+553,2024-04-26,consumer,LATAM,CL
+554,2023-11-19,consumer,LATAM,BR
+555,2025-01-16,consumer,North America,CA
+556,2024-11-22,consumer,LATAM,BR
+557,2025-03-09,consumer,North America,MX
+558,2025-07-13,business,North America,MX
+559,2025-03-23,consumer,North America,CA
+560,2024-01-25,consumer,North America,CA
+561,2023-12-05,consumer,EU,PL
+562,2024-10-06,consumer,EU,GB
+563,2024-09-30,consumer,APAC,SG
+564,2024-02-19,consumer,EU,GB
+565,2025-05-04,consumer,EU,NL
+566,2025-08-30,consumer,EU,FR
+567,2024-04-02,consumer,EU,NL
+568,2024-06-24,consumer,North America,US
+569,2024-03-10,business,EU,GB
+570,2025-07-03,consumer,EU,PL
+571,2025-02-19,consumer,APAC,AU
+572,2025-01-07,consumer,EU,NL
+573,2025-08-20,consumer,EU,IT
+574,2024-12-07,consumer,EU,IT
+575,2024-01-31,business,North America,US
+576,2025-05-04,business,APAC,AU
+577,2023-11-19,consumer,LATAM,CL
+578,2024-08-03,consumer,EU,IT
+579,2024-12-16,consumer,APAC,KR
+580,2024-05-18,consumer,EU,ES
+581,2024-08-27,business,EU,ES
+582,2025-04-06,consumer,North America,US
+583,2025-01-18,business,LATAM,CL
+584,2023-11-01,consumer,North America,CA
+585,2024-04-05,consumer,EU,PL
+586,2025-01-18,consumer,EU,IT
+587,2025-05-29,consumer,North America,MX
+588,2025-06-25,consumer,APAC,AU
+589,2025-03-13,consumer,North America,MX
+590,2024-09-29,consumer,APAC,JP
+591,2023-10-24,consumer,EU,ES
+592,2024-08-17,consumer,North America,MX
+593,2024-08-01,consumer,APAC,IN
+594,2023-09-06,consumer,EU,IT
+595,2023-10-20,consumer,North America,US
+596,2025-08-08,consumer,EU,NL
+597,2025-07-10,business,LATAM,CL
+598,2024-07-12,consumer,APAC,JP
+599,2024-04-13,consumer,LATAM,BR
+600,2024-04-11,business,North America,US
+601,2024-11-01,consumer,EU,PL
+602,2024-05-09,consumer,APAC,SG
+603,2024-12-10,consumer,North America,US
+604,2023-10-27,consumer,North America,MX
+605,2025-07-24,business,EU,IT
+606,2025-01-10,business,EU,FR
+607,2024-05-04,consumer,North America,US
+608,2025-06-13,business,APAC,SG
+609,2024-06-23,consumer,LATAM,CO
+610,2025-04-19,consumer,North America,MX
+611,2024-10-05,business,EU,DE
+612,2025-08-22,consumer,APAC,AU
+613,2024-05-13,consumer,LATAM,CO
+614,2024-02-25,consumer,North America,US
+615,2025-03-02,consumer,North America,MX
+616,2025-06-11,business,North America,US
+617,2023-10-03,consumer,EU,PL
+618,2024-08-14,business,North America,CA
+619,2024-10-05,consumer,APAC,AU
+620,2024-02-07,consumer,North America,CA
+621,2023-09-13,consumer,North America,CA
+622,2024-12-11,consumer,EU,PL
+623,2024-02-17,consumer,LATAM,CO
+624,2023-12-03,consumer,North America,CA
+625,2024-06-21,business,North America,US
+626,2023-12-04,consumer,APAC,IN
+627,2024-02-29,consumer,North America,MX
+628,2025-06-11,consumer,EU,GB
+629,2023-11-11,business,LATAM,CL
+630,2024-05-31,consumer,EU,DE
+631,2024-04-21,business,EU,ES
+632,2025-03-14,consumer,APAC,KR
+633,2023-12-14,consumer,LATAM,CO
+634,2024-06-20,consumer,LATAM,BR
+635,2025-04-02,consumer,APAC,KR
+636,2025-01-17,consumer,EU,ES
+637,2024-05-10,consumer,EU,ES
+638,2025-02-21,consumer,North America,CA
+639,2025-03-01,consumer,EU,ES
+640,2023-12-17,consumer,EU,DE
+641,2025-08-23,consumer,APAC,JP
+642,2025-03-10,business,North America,MX
+643,2024-05-12,consumer,EU,ES
+644,2023-11-17,business,North America,MX
+645,2023-11-05,consumer,APAC,JP
+646,2025-01-19,consumer,North America,MX
+647,2024-09-12,consumer,North America,US
+648,2024-09-23,consumer,APAC,KR
+649,2025-06-01,consumer,EU,NL
+650,2025-06-13,business,North America,CA
+651,2025-02-09,consumer,APAC,SG
+652,2024-07-16,consumer,EU,FR
+653,2023-11-08,consumer,North America,MX
+654,2025-08-29,consumer,EU,DE
+655,2025-01-22,consumer,North America,MX
+656,2024-07-26,business,LATAM,CO
+657,2024-04-11,business,North America,US
+658,2024-11-21,consumer,EU,ES
+659,2025-01-05,consumer,EU,NL
+660,2023-12-31,consumer,North America,MX
+661,2025-07-17,consumer,North America,MX
+662,2024-01-05,consumer,North America,US
+663,2025-02-17,consumer,EU,FR
+664,2024-04-10,consumer,North America,MX
+665,2023-10-16,consumer,APAC,AU
+666,2025-05-23,business,EU,GB
+667,2025-06-19,consumer,North America,CA
+668,2025-05-28,consumer,North America,MX
+669,2024-07-02,consumer,North America,CA
+670,2024-04-29,consumer,North America,CA
+671,2024-01-03,business,North America,CA
+672,2024-09-15,consumer,North America,CA
+673,2024-10-23,consumer,North America,MX
+674,2024-10-31,consumer,EU,GB
+675,2023-10-01,business,EU,DE
+676,2025-02-27,consumer,APAC,IN
+677,2025-05-16,consumer,North America,CA
+678,2025-05-19,consumer,EU,ES
+679,2024-09-15,business,North America,US
+680,2023-10-17,consumer,EU,FR
+681,2023-12-17,consumer,EU,IT
+682,2025-01-14,consumer,EU,PL
+683,2025-03-18,consumer,LATAM,CL
+684,2023-11-09,consumer,North America,MX
+685,2024-08-27,consumer,EU,GB
+686,2024-06-25,consumer,North America,CA
+687,2025-06-14,consumer,APAC,KR
+688,2024-08-27,consumer,North America,US
+689,2024-12-21,business,APAC,IN
+690,2025-03-09,business,EU,IT
+691,2024-10-29,business,EU,FR
+692,2024-08-17,consumer,EU,PL
+693,2024-11-02,consumer,LATAM,AR
+694,2025-01-25,consumer,LATAM,CO
+695,2023-11-21,consumer,North America,CA
+696,2023-12-29,consumer,North America,CA
+697,2024-09-09,consumer,EU,ES
+698,2024-07-12,business,EU,ES
+699,2025-02-01,consumer,North America,CA
+700,2024-12-20,consumer,EU,IT
+701,2024-07-03,business,EU,DE
+702,2024-07-03,consumer,APAC,SG
+703,2023-12-15,consumer,LATAM,CO
+704,2025-06-18,business,North America,MX
+705,2024-06-17,consumer,EU,FR
+706,2025-05-18,consumer,North America,CA
+707,2024-10-15,consumer,North America,US
+708,2023-12-02,consumer,North America,CA
+709,2024-04-11,consumer,North America,US
+710,2025-05-19,business,North America,US
+711,2024-07-06,consumer,LATAM,CO
+712,2024-11-18,business,EU,FR
+713,2024-06-06,consumer,EU,IT
+714,2025-03-30,consumer,EU,GB
+715,2025-01-26,business,EU,NL
+716,2025-02-19,consumer,North America,CA
+717,2024-07-26,consumer,North America,US
+718,2023-12-11,consumer,EU,FR
+719,2024-02-23,consumer,EU,NL
+720,2025-05-12,consumer,North America,MX
+721,2024-05-10,consumer,APAC,KR
+722,2024-08-06,consumer,APAC,AU
+723,2024-05-21,business,EU,GB
+724,2024-02-25,consumer,North America,MX
+725,2025-06-10,consumer,EU,FR
+726,2024-03-22,consumer,EU,IT
+727,2025-07-01,consumer,EU,IT
+728,2025-01-01,consumer,EU,NL
+729,2025-04-02,consumer,APAC,KR
+730,2025-07-28,consumer,APAC,JP
+731,2024-10-08,consumer,North America,US
+732,2023-10-05,consumer,EU,PL
+733,2023-09-22,consumer,North America,MX
+734,2024-09-23,consumer,LATAM,CL
+735,2025-03-17,consumer,EU,FR
+736,2025-03-27,consumer,North America,US
+737,2023-09-22,consumer,North America,MX
+738,2023-09-09,consumer,APAC,AU
+739,2025-02-12,consumer,APAC,JP
+740,2023-12-24,consumer,LATAM,BR
+741,2024-03-03,consumer,North America,MX
+742,2025-06-17,consumer,APAC,SG
+743,2025-07-17,consumer,North America,US
+744,2025-08-13,consumer,North America,US
+745,2024-06-17,consumer,North America,US
+746,2024-08-09,consumer,North America,MX
+747,2025-03-01,consumer,North America,US
+748,2025-03-12,consumer,North America,US
+749,2025-02-23,consumer,APAC,SG
+750,2025-08-24,consumer,EU,IT
+751,2025-03-14,consumer,LATAM,BR
+752,2025-01-27,business,EU,GB
+753,2025-02-03,business,North America,US
+754,2024-09-03,consumer,North America,US
+755,2025-03-12,consumer,LATAM,AR
+756,2024-05-28,consumer,North America,US
+757,2023-12-31,consumer,APAC,KR
+758,2024-02-15,consumer,EU,IT
+759,2025-08-20,consumer,North America,CA
+760,2023-11-13,consumer,EU,IT
+761,2025-07-12,business,APAC,AU
+762,2025-03-18,consumer,North America,CA
+763,2024-10-02,consumer,North America,US
+764,2023-10-20,business,EU,NL
+765,2025-08-08,consumer,APAC,AU
+766,2025-08-07,consumer,North America,US
+767,2025-05-18,consumer,LATAM,CO
+768,2025-07-07,consumer,EU,NL
+769,2024-11-26,business,EU,FR
+770,2024-08-11,consumer,North America,CA
+771,2025-07-05,consumer,EU,NL
+772,2025-04-12,business,North America,CA
+773,2023-12-09,business,North America,MX
+774,2025-05-04,consumer,North America,MX
+775,2025-05-08,consumer,APAC,AU
+776,2024-04-07,consumer,North America,MX
+777,2023-10-25,consumer,EU,IT
+778,2025-06-20,consumer,APAC,SG
+779,2025-02-16,consumer,North America,US
+780,2024-12-16,consumer,EU,NL
+781,2024-06-10,business,LATAM,AR
+782,2023-09-29,consumer,LATAM,BR
+783,2025-03-29,consumer,APAC,AU
+784,2024-02-19,consumer,LATAM,CL
+785,2024-10-10,business,North America,MX
+786,2024-02-19,consumer,North America,CA
+787,2024-10-29,consumer,APAC,SG
+788,2025-05-28,consumer,North America,CA
+789,2024-04-21,consumer,North America,MX
+790,2024-11-15,consumer,North America,MX
+791,2025-04-10,business,North America,CA
+792,2025-08-17,consumer,North America,US
+793,2024-05-27,consumer,EU,FR
+794,2025-07-15,consumer,APAC,JP
+795,2025-03-01,consumer,LATAM,CL
+796,2024-12-16,consumer,APAC,SG
+797,2023-12-03,business,APAC,AU
+798,2024-06-18,consumer,North America,US
+799,2024-10-02,consumer,APAC,IN
+800,2023-10-20,consumer,North America,CA
+801,2024-09-04,consumer,EU,NL
+802,2023-09-28,business,North America,MX
+803,2024-11-20,consumer,North America,US
+804,2025-07-12,consumer,EU,NL
+805,2024-03-06,business,EU,DE
+806,2024-09-26,consumer,North America,CA
+807,2024-05-11,business,EU,FR
+808,2025-04-10,business,EU,IT
+809,2024-10-05,business,LATAM,CO
+810,2023-11-20,consumer,North America,MX
+811,2023-11-18,business,North America,US
+812,2023-11-10,business,EU,NL
+813,2025-03-23,consumer,North America,US
+814,2024-10-22,consumer,EU,PL
+815,2023-10-20,consumer,LATAM,AR
+816,2025-04-23,consumer,North America,US
+817,2023-10-03,consumer,North America,CA
+818,2024-02-23,consumer,North America,MX
+819,2023-10-23,consumer,EU,DE
+820,2023-10-01,consumer,North America,CA
+821,2024-12-17,consumer,EU,DE
+822,2024-01-30,consumer,EU,FR
+823,2025-08-04,consumer,LATAM,BR
+824,2024-05-26,business,North America,MX
+825,2025-05-08,business,EU,ES
+826,2024-10-18,consumer,North America,US
+827,2024-08-18,consumer,North America,CA
+828,2024-06-25,business,APAC,AU
+829,2025-08-19,consumer,North America,CA
+830,2024-05-26,consumer,EU,IT
+831,2024-10-14,consumer,North America,US
+832,2024-09-26,consumer,North America,MX
+833,2025-07-23,consumer,North America,US
+834,2023-12-08,consumer,North America,CA
+835,2024-08-11,consumer,North America,CA
+836,2023-11-28,consumer,EU,PL
+837,2024-06-28,consumer,LATAM,CO
+838,2025-01-16,consumer,North America,MX
+839,2024-04-18,business,EU,ES
+840,2024-12-12,consumer,LATAM,BR
+841,2024-05-27,consumer,EU,NL
+842,2024-06-16,business,North America,MX
+843,2023-12-24,business,APAC,KR
+844,2025-01-29,consumer,APAC,JP
+845,2024-02-22,consumer,North America,MX
+846,2025-02-22,consumer,North America,US
+847,2024-10-26,consumer,North America,CA
+848,2024-09-23,business,APAC,AU
+849,2025-02-12,consumer,EU,PL
+850,2024-04-01,consumer,EU,PL
+851,2024-04-25,consumer,EU,ES
+852,2024-01-26,business,EU,NL
+853,2023-11-01,business,EU,NL
+854,2024-05-18,business,APAC,AU
+855,2024-03-18,business,EU,FR
+856,2024-09-21,consumer,North America,MX
+857,2023-11-08,consumer,EU,ES
+858,2025-03-28,consumer,North America,MX
+859,2025-03-01,business,North America,MX
+860,2024-11-23,consumer,North America,US
+861,2023-11-30,consumer,EU,ES
+862,2025-08-28,business,EU,FR
+863,2025-04-05,consumer,EU,PL
+864,2023-10-16,consumer,North America,MX
+865,2025-07-06,consumer,EU,PL
+866,2024-10-03,business,APAC,AU
+867,2025-04-29,consumer,APAC,AU
+868,2023-12-02,consumer,EU,ES
+869,2024-08-03,consumer,North America,US
+870,2025-07-16,consumer,APAC,AU
+871,2025-01-30,consumer,LATAM,CO
+872,2023-10-05,consumer,EU,DE
+873,2024-02-11,consumer,North America,MX
+874,2024-12-25,business,North America,CA
+875,2025-08-26,business,North America,US
+876,2024-06-22,consumer,North America,CA
+877,2024-11-21,consumer,EU,IT
+878,2024-08-10,consumer,North America,MX
+879,2024-02-26,consumer,LATAM,CL
+880,2024-12-25,consumer,EU,DE
+881,2024-03-26,consumer,North America,CA
+882,2024-04-28,consumer,EU,DE
+883,2025-03-17,consumer,EU,FR
+884,2024-12-06,consumer,North America,MX
+885,2024-10-19,consumer,North America,MX
+886,2023-10-22,consumer,EU,NL
+887,2024-03-20,consumer,EU,NL
+888,2025-01-17,consumer,North America,MX
+889,2025-01-09,consumer,North America,US
+890,2024-08-22,business,North America,US
+891,2023-12-04,business,North America,MX
+892,2025-07-13,consumer,EU,IT
+893,2025-04-02,business,North America,CA
+894,2025-04-17,consumer,EU,IT
+895,2024-12-28,business,EU,GB
+896,2023-09-06,consumer,North America,MX
+897,2024-01-25,consumer,LATAM,BR
+898,2024-05-27,consumer,EU,DE
+899,2024-08-22,consumer,APAC,IN
+900,2024-12-01,consumer,EU,FR
+901,2024-08-28,consumer,APAC,KR
+902,2023-11-13,consumer,North America,CA
+903,2024-11-15,consumer,APAC,SG
+904,2025-02-11,business,EU,ES
+905,2025-07-09,consumer,EU,ES
+906,2024-01-17,consumer,LATAM,AR
+907,2025-02-19,business,LATAM,AR
+908,2024-07-12,consumer,EU,GB
+909,2024-01-21,consumer,EU,NL
+910,2025-01-13,consumer,EU,IT
+911,2024-08-25,consumer,EU,ES
+912,2025-04-10,consumer,North America,US
+913,2025-07-29,consumer,North America,MX
+914,2024-06-20,consumer,APAC,KR
+915,2024-12-24,consumer,EU,IT
+916,2024-05-13,business,EU,DE
+917,2023-11-28,consumer,North America,CA
+918,2025-07-25,consumer,EU,GB
+919,2025-08-08,consumer,North America,MX
+920,2025-07-17,consumer,North America,CA
+921,2023-11-08,consumer,EU,NL
+922,2024-01-23,consumer,EU,ES
+923,2024-12-21,consumer,EU,GB
+924,2024-11-01,consumer,EU,PL
+925,2025-08-02,consumer,EU,PL
+926,2025-07-06,consumer,APAC,IN
+927,2025-07-24,business,LATAM,AR
+928,2024-02-11,consumer,North America,US
+929,2024-09-29,consumer,EU,PL
+930,2024-03-05,business,North America,US
+931,2024-04-04,consumer,EU,FR
+932,2024-06-28,consumer,North America,US
+933,2025-05-26,consumer,North America,MX
+934,2025-04-15,business,EU,DE
+935,2024-11-19,consumer,North America,US
+936,2023-10-15,business,APAC,SG
+937,2023-12-11,consumer,APAC,SG
+938,2024-12-17,business,APAC,IN
+939,2025-06-19,consumer,North America,CA
+940,2024-06-30,consumer,North America,CA
+941,2024-12-19,consumer,North America,MX
+942,2024-11-02,consumer,EU,ES
+943,2024-06-30,consumer,North America,MX
+944,2024-08-16,business,APAC,IN
+945,2024-11-24,business,North America,US
+946,2024-04-27,consumer,EU,ES
+947,2025-03-14,consumer,APAC,KR
+948,2025-03-28,consumer,North America,US
+949,2025-08-25,consumer,EU,NL
+950,2024-10-14,consumer,North America,US
+951,2023-10-29,business,North America,CA
+952,2024-12-03,consumer,EU,GB
+953,2025-07-07,business,APAC,IN
+954,2023-10-29,business,North America,US
+955,2025-04-30,consumer,LATAM,CL
+956,2023-10-19,consumer,EU,FR
+957,2023-09-23,consumer,EU,PL
+958,2024-10-05,consumer,North America,US
+959,2024-03-12,consumer,APAC,KR
+960,2025-05-27,consumer,EU,NL
+961,2025-01-01,consumer,APAC,KR
+962,2025-07-09,consumer,EU,GB
+963,2023-09-11,consumer,APAC,JP
+964,2024-08-10,consumer,North America,MX
+965,2024-07-22,consumer,APAC,IN
+966,2024-12-10,consumer,EU,ES
+967,2024-01-11,consumer,EU,PL
+968,2024-06-23,consumer,EU,FR
+969,2024-04-18,consumer,North America,MX
+970,2025-06-05,consumer,North America,CA
+971,2023-11-23,consumer,North America,US
+972,2023-10-21,consumer,EU,ES
+973,2024-12-19,consumer,North America,US
+974,2025-02-16,consumer,EU,ES
+975,2023-10-07,consumer,EU,IT
+976,2024-09-08,consumer,LATAM,BR
+977,2023-10-04,consumer,APAC,JP
+978,2024-04-26,business,North America,MX
+979,2024-05-20,consumer,APAC,AU
+980,2025-04-05,consumer,EU,DE
+981,2023-10-30,consumer,APAC,KR
+982,2023-10-03,consumer,North America,MX
+983,2023-10-19,consumer,North America,MX
+984,2024-02-26,consumer,North America,CA
+985,2025-06-22,consumer,North America,US
+986,2024-07-26,consumer,APAC,AU
+987,2025-02-07,consumer,EU,NL
+988,2024-01-10,consumer,APAC,IN
+989,2024-10-15,consumer,EU,NL
+990,2025-03-25,consumer,EU,GB
+991,2024-07-06,consumer,EU,IT
+992,2025-08-31,consumer,APAC,AU
+993,2025-05-13,consumer,North America,CA
+994,2024-09-22,consumer,North America,CA
+995,2024-07-21,consumer,EU,IT
+996,2025-03-17,consumer,APAC,IN
+997,2024-06-04,consumer,APAC,KR
+998,2023-09-21,business,EU,GB
+999,2025-01-05,consumer,APAC,SG
+1000,2024-01-16,consumer,North America,MX
+1001,2024-01-15,business,North America,CA
+1002,2025-03-23,business,North America,MX
+1003,2025-02-11,consumer,North America,CA
+1004,2024-04-19,consumer,APAC,KR
+1005,2024-08-09,consumer,North America,MX
+1006,2025-04-13,business,North America,US
+1007,2024-09-19,consumer,LATAM,CL
+1008,2023-10-29,business,APAC,JP
+1009,2024-06-06,consumer,EU,NL
+1010,2025-07-14,business,APAC,SG
+1011,2025-02-25,consumer,EU,FR
+1012,2024-04-21,consumer,North America,CA
+1013,2025-01-22,consumer,EU,GB
+1014,2024-06-16,business,EU,DE
+1015,2025-05-03,business,North America,CA
+1016,2025-07-02,consumer,EU,NL
+1017,2024-02-11,consumer,EU,NL
+1018,2024-11-07,consumer,EU,FR
+1019,2024-02-07,consumer,North America,US
+1020,2025-08-01,business,EU,IT
+1021,2023-12-04,business,EU,DE
+1022,2024-12-12,consumer,EU,FR
+1023,2024-08-09,business,EU,GB
+1024,2024-04-07,consumer,LATAM,AR
+1025,2024-11-24,consumer,APAC,IN
+1026,2025-08-08,consumer,North America,CA
+1027,2023-09-24,consumer,North America,CA
+1028,2024-03-15,consumer,North America,CA
+1029,2024-03-20,consumer,APAC,AU
+1030,2024-11-16,consumer,LATAM,AR
+1031,2024-05-20,consumer,North America,MX
+1032,2024-07-01,business,APAC,KR
+1033,2024-02-13,consumer,APAC,IN
+1034,2023-12-15,consumer,North America,MX
+1035,2024-05-04,business,EU,FR
+1036,2024-10-08,consumer,LATAM,BR
+1037,2025-07-13,business,LATAM,AR
+1038,2025-06-10,consumer,APAC,JP
+1039,2024-02-15,consumer,North America,US
+1040,2024-08-19,business,EU,PL
+1041,2023-09-21,consumer,EU,IT
+1042,2024-10-26,consumer,LATAM,BR
+1043,2023-09-26,business,North America,CA
+1044,2024-10-09,business,North America,US
+1045,2025-08-23,consumer,North America,CA
+1046,2023-10-12,consumer,LATAM,CL
+1047,2025-04-15,business,EU,GB
+1048,2025-03-10,consumer,LATAM,CO
+1049,2023-11-13,consumer,EU,ES
+1050,2025-02-10,consumer,North America,US
+1051,2025-07-13,consumer,EU,FR
+1052,2024-07-19,consumer,North America,MX
+1053,2024-04-24,business,North America,US
+1054,2025-07-24,consumer,North America,US
+1055,2025-02-26,business,EU,ES
+1056,2023-11-28,consumer,North America,CA
+1057,2024-05-21,business,North America,CA
+1058,2023-11-24,consumer,APAC,AU
+1059,2023-11-08,consumer,North America,MX
+1060,2025-02-27,consumer,North America,MX
+1061,2024-10-16,consumer,EU,FR
+1062,2024-04-22,consumer,EU,PL
+1063,2025-07-07,business,North America,US
+1064,2024-03-28,consumer,North America,MX
+1065,2024-12-09,consumer,North America,CA
+1066,2025-07-02,consumer,EU,DE
+1067,2024-11-26,consumer,North America,MX
+1068,2023-12-28,consumer,LATAM,CL
+1069,2024-08-05,business,North America,MX
+1070,2025-06-23,consumer,APAC,AU
+1071,2024-06-08,consumer,LATAM,CL
+1072,2024-02-11,consumer,EU,IT
+1073,2024-05-21,business,EU,ES
+1074,2024-03-04,consumer,EU,IT
+1075,2023-11-04,consumer,North America,MX
+1076,2025-03-18,consumer,North America,US
+1077,2023-11-23,business,EU,PL
+1078,2024-12-03,consumer,LATAM,CL
+1079,2023-11-07,consumer,North America,US
+1080,2023-12-02,consumer,North America,US
+1081,2025-02-18,consumer,EU,ES
+1082,2025-05-13,consumer,North America,CA
+1083,2025-02-23,consumer,APAC,JP
+1084,2024-06-08,consumer,North America,MX
+1085,2024-05-22,consumer,LATAM,CO
+1086,2024-07-02,consumer,APAC,IN
+1087,2023-11-20,business,APAC,IN
+1088,2024-08-21,consumer,APAC,SG
+1089,2024-08-22,consumer,North America,US
+1090,2025-01-25,consumer,APAC,JP
+1091,2024-12-10,business,North America,MX
+1092,2025-03-19,consumer,North America,CA
+1093,2025-05-31,business,North America,CA
+1094,2024-02-26,consumer,North America,MX
+1095,2023-11-19,consumer,EU,GB
+1096,2024-03-13,consumer,APAC,AU
+1097,2024-01-22,consumer,EU,NL
+1098,2024-03-03,business,North America,US
+1099,2024-04-15,consumer,North America,US
+1100,2024-08-11,consumer,EU,ES
+1101,2024-03-18,consumer,EU,GB
+1102,2023-12-30,consumer,North America,US
+1103,2024-05-08,consumer,EU,GB
+1104,2024-05-15,consumer,APAC,SG
+1105,2025-05-27,consumer,EU,DE
+1106,2024-08-30,consumer,North America,MX
+1107,2025-05-10,business,North America,MX
+1108,2024-05-12,consumer,LATAM,AR
+1109,2025-05-15,consumer,APAC,KR
+1110,2024-03-04,consumer,North America,CA
+1111,2025-07-26,consumer,North America,US
+1112,2024-01-23,consumer,APAC,IN
+1113,2024-12-28,consumer,North America,US
+1114,2025-06-29,business,LATAM,CL
+1115,2025-02-07,consumer,EU,GB
+1116,2023-10-16,business,EU,GB
+1117,2025-07-30,consumer,APAC,AU
+1118,2025-01-26,consumer,North America,CA
+1119,2025-08-17,consumer,EU,NL
+1120,2025-05-26,business,North America,US
+1121,2025-07-31,consumer,North America,US
+1122,2024-11-07,consumer,APAC,SG
+1123,2024-06-14,consumer,North America,US
+1124,2023-11-10,consumer,APAC,SG
+1125,2023-09-09,consumer,EU,DE
+1126,2025-04-27,consumer,EU,ES
+1127,2023-12-05,business,LATAM,CL
+1128,2024-02-03,consumer,EU,IT
+1129,2025-05-06,consumer,APAC,AU
+1130,2024-10-03,consumer,North America,MX
+1131,2025-03-28,consumer,EU,ES
+1132,2025-02-21,consumer,EU,IT
+1133,2023-09-19,consumer,LATAM,AR
+1134,2025-03-27,consumer,North America,MX
+1135,2024-08-13,consumer,EU,ES
+1136,2024-06-14,consumer,EU,FR
+1137,2023-11-05,consumer,APAC,KR
+1138,2025-05-03,consumer,EU,ES
+1139,2023-09-11,consumer,EU,GB
+1140,2025-09-02,consumer,EU,FR
+1141,2024-03-29,consumer,APAC,IN
+1142,2024-10-10,consumer,North America,CA
+1143,2025-07-31,consumer,APAC,AU
+1144,2025-07-03,business,North America,MX
+1145,2024-03-24,consumer,North America,US
+1146,2024-01-09,consumer,North America,MX
+1147,2025-01-28,consumer,APAC,JP
+1148,2024-12-16,consumer,APAC,KR
+1149,2024-04-08,consumer,EU,GB
+1150,2023-10-04,consumer,APAC,SG
+1151,2024-12-26,consumer,APAC,SG
+1152,2023-10-02,consumer,EU,DE
+1153,2023-09-25,consumer,North America,MX
+1154,2023-11-09,business,APAC,AU
+1155,2024-06-12,consumer,APAC,IN
+1156,2023-10-20,consumer,North America,US
+1157,2024-08-30,consumer,LATAM,CO
+1158,2025-07-23,consumer,North America,US
+1159,2025-05-17,consumer,North America,CA
+1160,2023-09-21,consumer,North America,MX
+1161,2024-04-05,consumer,North America,US
+1162,2024-07-15,consumer,North America,MX
+1163,2025-08-14,consumer,APAC,SG
+1164,2024-09-18,consumer,North America,CA
+1165,2025-04-14,consumer,North America,US
+1166,2024-08-28,consumer,EU,ES
+1167,2024-07-08,consumer,North America,US
+1168,2023-09-17,consumer,LATAM,CL
+1169,2025-02-22,business,APAC,KR
+1170,2023-10-18,consumer,North America,US
+1171,2024-07-01,consumer,EU,FR
+1172,2024-03-09,consumer,North America,MX
+1173,2024-07-07,consumer,EU,ES
+1174,2025-07-03,consumer,North America,US
+1175,2024-10-04,consumer,North America,CA
+1176,2024-08-17,consumer,EU,NL
+1177,2023-11-29,consumer,APAC,JP
+1178,2025-07-09,business,North America,US
+1179,2024-12-28,consumer,North America,MX
+1180,2025-01-25,consumer,LATAM,CO
+1181,2024-02-21,consumer,LATAM,CL
+1182,2023-10-16,business,North America,MX
+1183,2024-06-30,business,North America,US
+1184,2023-11-25,consumer,EU,GB
+1185,2024-08-29,business,EU,FR
+1186,2023-11-23,consumer,North America,MX
+1187,2024-11-30,consumer,North America,MX
+1188,2025-06-12,consumer,APAC,KR
+1189,2025-05-06,consumer,EU,ES
+1190,2024-09-29,business,North America,CA
+1191,2024-07-31,business,North America,CA
+1192,2025-03-18,business,North America,CA
+1193,2023-12-30,consumer,LATAM,CO
+1194,2024-01-28,consumer,North America,US
+1195,2024-12-21,consumer,APAC,AU
+1196,2023-09-20,consumer,EU,GB
+1197,2025-01-06,consumer,EU,NL
+1198,2023-09-25,consumer,EU,IT
+1199,2024-02-14,consumer,APAC,JP
+1200,2025-05-31,consumer,EU,ES
+1201,2025-07-04,consumer,EU,IT
+1202,2024-12-29,consumer,North America,MX
+1203,2025-07-20,consumer,North America,CA
+1204,2024-05-29,consumer,EU,NL
+1205,2024-06-22,consumer,APAC,AU
+1206,2023-12-29,consumer,EU,DE
+1207,2024-05-20,consumer,North America,CA
+1208,2024-11-24,consumer,APAC,KR
+1209,2025-02-12,consumer,EU,GB
+1210,2024-03-30,consumer,EU,ES
+1211,2023-12-16,consumer,North America,MX
+1212,2024-12-10,consumer,EU,PL
+1213,2024-08-02,consumer,North America,MX
+1214,2025-05-04,consumer,EU,PL
+1215,2025-06-26,consumer,North America,CA
+1216,2025-08-07,consumer,APAC,KR
+1217,2023-10-30,consumer,LATAM,AR
+1218,2025-04-06,consumer,North America,CA
+1219,2025-01-20,consumer,EU,NL
+1220,2025-06-06,consumer,LATAM,CL
+1221,2024-06-22,consumer,North America,MX
+1222,2024-09-12,business,EU,PL
+1223,2023-09-08,business,LATAM,BR
+1224,2025-06-24,consumer,APAC,KR
+1225,2025-07-13,business,North America,CA
+1226,2025-02-24,consumer,North America,US
+1227,2025-08-08,consumer,EU,FR
+1228,2024-03-01,consumer,North America,CA
+1229,2025-04-06,consumer,EU,FR
+1230,2023-09-11,consumer,North America,MX
+1231,2025-08-07,consumer,APAC,KR
+1232,2025-04-02,consumer,LATAM,AR
+1233,2025-01-25,consumer,EU,PL
+1234,2024-02-04,consumer,EU,ES
+1235,2023-11-14,consumer,EU,IT
+1236,2024-05-20,consumer,North America,MX
+1237,2024-02-05,consumer,North America,CA
+1238,2024-08-29,business,North America,US
+1239,2024-07-20,consumer,EU,DE
+1240,2025-08-15,consumer,EU,IT
+1241,2025-01-09,consumer,North America,CA
+1242,2024-05-27,consumer,APAC,IN
+1243,2023-10-09,consumer,APAC,SG
+1244,2023-11-25,consumer,APAC,JP
+1245,2025-07-27,business,EU,GB
+1246,2025-04-09,consumer,EU,PL
+1247,2024-05-19,business,North America,MX
+1248,2025-08-05,consumer,EU,NL
+1249,2024-05-19,consumer,North America,US
+1250,2024-02-17,consumer,APAC,JP
+1251,2024-04-05,consumer,North America,MX
+1252,2024-08-22,consumer,EU,ES
+1253,2025-06-21,consumer,EU,ES
+1254,2024-07-20,consumer,EU,DE
+1255,2024-03-19,consumer,LATAM,CO
+1256,2024-03-15,consumer,EU,GB
+1257,2023-10-29,consumer,EU,IT
+1258,2025-03-27,consumer,EU,NL
+1259,2024-10-21,business,EU,IT
+1260,2024-03-16,consumer,North America,MX
+1261,2023-10-24,consumer,North America,US
+1262,2025-04-19,consumer,APAC,JP
+1263,2024-05-23,consumer,North America,US
+1264,2024-01-28,consumer,North America,US
+1265,2024-12-31,consumer,EU,FR
+1266,2025-08-06,business,EU,PL
+1267,2025-02-28,consumer,APAC,KR
+1268,2024-10-20,consumer,EU,NL
+1269,2025-07-26,consumer,North America,CA
+1270,2024-10-23,consumer,North America,MX
+1271,2025-05-17,consumer,EU,ES
+1272,2025-05-18,consumer,North America,US
+1273,2024-06-19,business,LATAM,CL
+1274,2024-07-08,consumer,North America,CA
+1275,2024-02-29,consumer,North America,MX
+1276,2024-06-21,consumer,LATAM,BR
+1277,2024-06-25,consumer,APAC,AU
+1278,2023-12-22,consumer,EU,NL
+1279,2024-05-21,business,EU,GB
+1280,2023-11-13,consumer,North America,US
+1281,2024-11-17,consumer,EU,GB
+1282,2024-12-18,consumer,North America,US
+1283,2023-10-01,consumer,North America,MX
+1284,2024-12-12,consumer,North America,US
+1285,2024-08-23,consumer,EU,NL
+1286,2024-02-29,consumer,APAC,JP
+1287,2024-07-22,consumer,North America,CA
+1288,2024-02-14,consumer,North America,US
+1289,2023-09-07,business,North America,MX
+1290,2024-04-05,consumer,EU,DE
+1291,2025-05-31,consumer,APAC,SG
+1292,2025-07-04,consumer,North America,CA
+1293,2024-12-06,consumer,EU,PL
+1294,2025-03-18,consumer,EU,DE
+1295,2024-06-02,consumer,EU,ES
+1296,2024-12-12,consumer,EU,NL
+1297,2024-08-31,consumer,EU,ES
+1298,2025-03-07,consumer,APAC,AU
+1299,2024-03-14,consumer,LATAM,CL
+1300,2025-01-13,consumer,APAC,KR
+1301,2025-02-16,business,EU,IT
+1302,2024-09-24,business,North America,CA
+1303,2024-03-28,consumer,APAC,JP
+1304,2025-08-23,consumer,North America,CA
+1305,2024-09-21,consumer,APAC,KR
+1306,2024-04-22,consumer,LATAM,CL
+1307,2023-09-12,consumer,North America,US
+1308,2025-06-24,consumer,North America,MX
+1309,2024-08-14,consumer,APAC,KR
+1310,2024-12-26,consumer,EU,IT
+1311,2025-02-10,consumer,EU,FR
+1312,2025-04-26,business,EU,IT
+1313,2024-05-20,consumer,North America,US
+1314,2025-06-19,business,North America,MX
+1315,2025-01-06,business,LATAM,AR
+1316,2025-08-28,consumer,EU,IT
+1317,2023-12-12,consumer,LATAM,BR
+1318,2024-01-25,consumer,North America,US
+1319,2024-07-24,consumer,EU,ES
+1320,2024-11-12,consumer,EU,PL
+1321,2025-04-13,consumer,North America,US
+1322,2024-06-05,consumer,North America,US
+1323,2024-06-14,consumer,EU,PL
+1324,2025-07-11,consumer,North America,US
+1325,2025-04-28,business,North America,CA
+1326,2025-01-09,consumer,APAC,AU
+1327,2024-02-19,consumer,APAC,IN
+1328,2023-11-02,consumer,North America,US
+1329,2024-07-07,consumer,EU,FR
+1330,2024-02-08,consumer,North America,US
+1331,2025-06-26,consumer,EU,ES
+1332,2023-10-15,consumer,North America,MX
+1333,2025-06-07,business,APAC,JP
+1334,2024-04-08,consumer,APAC,KR
+1335,2025-06-01,consumer,EU,ES
+1336,2025-06-24,consumer,North America,MX
+1337,2024-08-13,business,EU,ES
+1338,2025-05-03,business,APAC,AU
+1339,2024-09-19,consumer,APAC,JP
+1340,2025-05-10,consumer,APAC,SG
+1341,2025-05-18,consumer,North America,CA
+1342,2025-04-12,consumer,North America,US
+1343,2024-07-24,consumer,North America,US
+1344,2024-07-16,consumer,APAC,JP
+1345,2024-08-28,consumer,APAC,IN
+1346,2023-11-20,consumer,LATAM,CL
+1347,2024-07-09,consumer,APAC,SG
+1348,2024-06-20,consumer,APAC,SG
+1349,2025-07-28,consumer,North America,MX
+1350,2023-11-17,consumer,North America,CA
+1351,2024-11-24,consumer,North America,US
+1352,2025-08-15,business,EU,FR
+1353,2024-01-30,consumer,North America,MX
+1354,2023-11-24,consumer,EU,PL
+1355,2025-01-16,consumer,EU,FR
+1356,2025-07-20,consumer,EU,DE
+1357,2024-04-22,consumer,APAC,SG
+1358,2025-01-30,consumer,North America,US
+1359,2024-08-15,consumer,LATAM,AR
+1360,2024-08-05,consumer,EU,FR
+1361,2025-06-28,consumer,EU,ES
+1362,2024-07-15,consumer,North America,CA
+1363,2024-01-26,consumer,North America,US
+1364,2024-05-05,consumer,North America,CA
+1365,2024-10-23,consumer,EU,ES
+1366,2024-10-10,consumer,EU,GB
+1367,2025-05-17,consumer,LATAM,CO
+1368,2025-08-10,consumer,North America,MX
+1369,2024-03-11,consumer,APAC,JP
+1370,2025-07-12,consumer,EU,PL
+1371,2025-01-31,consumer,EU,PL
+1372,2023-09-03,consumer,EU,FR
+1373,2025-03-15,consumer,LATAM,AR
+1374,2024-10-10,consumer,North America,US
+1375,2024-05-06,consumer,North America,US
+1376,2025-05-23,consumer,APAC,KR
+1377,2024-01-31,consumer,North America,CA
+1378,2024-01-27,consumer,EU,GB
+1379,2023-12-16,consumer,North America,MX
+1380,2024-07-29,consumer,North America,US
+1381,2023-10-31,consumer,EU,GB
+1382,2025-07-14,consumer,North America,US
+1383,2024-11-23,consumer,North America,US
+1384,2024-03-17,business,EU,GB
+1385,2024-01-29,business,North America,MX
+1386,2024-07-26,business,EU,IT
+1387,2024-08-27,consumer,EU,DE
+1388,2023-09-24,consumer,North America,CA
+1389,2025-04-12,consumer,North America,CA
+1390,2024-05-25,consumer,North America,US
+1391,2024-10-31,consumer,EU,NL
+1392,2024-01-16,business,North America,MX
+1393,2025-02-27,consumer,LATAM,CO
+1394,2024-05-30,consumer,EU,DE
+1395,2025-06-28,consumer,North America,MX
+1396,2024-05-19,consumer,EU,DE
+1397,2025-03-24,consumer,LATAM,AR
+1398,2024-03-13,consumer,APAC,JP
+1399,2024-06-05,business,LATAM,BR
+1400,2024-12-16,consumer,North America,US
+1401,2023-09-12,consumer,North America,MX
+1402,2025-07-22,consumer,North America,MX
+1403,2025-06-24,consumer,North America,CA
+1404,2025-03-25,consumer,North America,MX
+1405,2024-03-12,consumer,EU,FR
+1406,2024-10-18,business,EU,GB
+1407,2024-12-27,consumer,APAC,KR
+1408,2024-11-23,business,North America,MX
+1409,2023-10-21,consumer,North America,MX
+1410,2024-09-17,consumer,EU,IT
+1411,2025-08-28,consumer,EU,IT
+1412,2024-03-02,consumer,North America,CA
+1413,2024-03-17,consumer,EU,DE
+1414,2025-07-30,consumer,North America,MX
+1415,2025-06-07,business,APAC,AU
+1416,2024-10-04,consumer,North America,US
+1417,2025-05-23,consumer,EU,ES
+1418,2025-04-08,consumer,EU,PL
+1419,2024-11-27,business,APAC,IN
+1420,2023-12-02,consumer,North America,CA
+1421,2025-08-06,consumer,North America,MX
+1422,2024-05-12,consumer,APAC,JP
+1423,2024-05-01,consumer,EU,GB
+1424,2024-06-07,consumer,North America,US
+1425,2024-01-20,consumer,LATAM,BR
+1426,2024-04-22,consumer,LATAM,CO
+1427,2025-03-24,consumer,EU,NL
+1428,2024-02-16,consumer,North America,US
+1429,2025-06-02,consumer,North America,MX
+1430,2025-05-02,consumer,North America,CA
+1431,2025-05-20,business,EU,PL
+1432,2023-10-30,consumer,LATAM,CL
+1433,2024-01-08,consumer,EU,GB
+1434,2024-06-20,consumer,North America,MX
+1435,2024-03-30,consumer,LATAM,BR
+1436,2024-10-28,consumer,North America,US
+1437,2024-03-17,consumer,EU,GB
+1438,2023-12-22,business,EU,FR
+1439,2025-06-10,consumer,APAC,JP
+1440,2024-11-22,consumer,EU,PL
+1441,2024-09-06,business,EU,PL
+1442,2024-01-19,business,LATAM,CO
+1443,2024-11-25,consumer,EU,DE
+1444,2024-05-09,consumer,North America,CA
+1445,2025-03-30,consumer,North America,CA
+1446,2025-02-16,business,EU,DE
+1447,2024-12-11,consumer,North America,CA
+1448,2025-06-01,consumer,EU,NL
+1449,2024-07-06,consumer,EU,DE
+1450,2025-07-29,business,EU,DE
+1451,2025-04-05,consumer,North America,MX
+1452,2024-10-09,consumer,North America,US
+1453,2025-04-30,consumer,North America,US
+1454,2024-12-05,consumer,LATAM,CL
+1455,2024-06-24,consumer,North America,MX
+1456,2023-12-22,consumer,EU,DE
+1457,2025-07-13,business,EU,GB
+1458,2024-02-08,consumer,North America,US
+1459,2023-11-16,business,EU,IT
+1460,2023-09-21,consumer,North America,MX
+1461,2024-07-06,business,LATAM,CO
+1462,2024-03-19,consumer,APAC,IN
+1463,2025-06-25,consumer,North America,MX
+1464,2025-05-31,consumer,APAC,AU
+1465,2024-12-03,consumer,LATAM,CO
+1466,2023-09-16,consumer,APAC,AU
+1467,2025-05-11,consumer,LATAM,BR
+1468,2025-05-12,consumer,APAC,KR
+1469,2025-01-07,business,EU,IT
+1470,2023-09-25,consumer,APAC,JP
+1471,2024-02-08,consumer,North America,CA
+1472,2025-02-19,consumer,LATAM,CL
+1473,2024-01-08,consumer,APAC,IN
+1474,2024-10-22,consumer,North America,MX
+1475,2025-03-11,consumer,EU,ES
+1476,2024-09-20,consumer,EU,ES
+1477,2024-07-28,business,North America,CA
+1478,2024-04-30,business,APAC,SG
+1479,2024-02-29,business,EU,PL
+1480,2024-05-12,consumer,EU,NL
+1481,2024-04-12,business,North America,US
+1482,2024-12-14,consumer,LATAM,CO
+1483,2024-01-10,consumer,APAC,AU
+1484,2023-12-17,consumer,LATAM,CO
+1485,2024-05-01,consumer,LATAM,CO
+1486,2025-02-19,consumer,EU,PL
+1487,2024-01-24,consumer,APAC,JP
+1488,2023-09-13,consumer,North America,CA
+1489,2025-04-17,consumer,APAC,IN
+1490,2023-10-19,consumer,EU,FR
+1491,2024-06-06,consumer,LATAM,CO
+1492,2023-12-01,business,North America,US
+1493,2023-10-15,consumer,EU,GB
+1494,2023-09-29,consumer,EU,IT
+1495,2023-10-19,consumer,North America,US
+1496,2025-03-04,consumer,EU,PL
+1497,2025-01-19,consumer,North America,CA
+1498,2024-06-23,consumer,LATAM,CL
+1499,2024-10-02,consumer,EU,GB
+1500,2024-02-23,business,APAC,IN

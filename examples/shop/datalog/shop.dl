@@ -1,0 +1,118 @@
+// The shop cube, stated as catalog facts (rules/catalog.dl) — what `lower()` emits
+// from ../yaml/shop.yaml, written by hand — and one modifier of its own.
+#define CUBE "shop"
+
+c_cube(CUBE, "orders", "o").
+c_join(CUBE, "customers", 0, "LEFT", "customers", "c", "o.customer_id = c.customer_id").
+
+c_metric(CUBE, "revenue").
+c_m_info(CUBE, "revenue", "description", "Gross order revenue.").
+c_m_info(CUBE, "revenue", "value_type", "number").
+c_m_info(CUBE, "revenue", "additivity", "additive").
+c_m_agg(CUBE, "revenue", "sum", "o.revenue").
+c_display(CUBE, "m:revenue", "{\"label\":\"Revenue\",\"unit\":\"USD\",\"format\":\"currency\",\"good_when\":\"up\"}").
+c_metric(CUBE, "orders").
+c_m_info(CUBE, "orders", "description", "Number of orders.").
+c_m_info(CUBE, "orders", "value_type", "integer").
+c_m_info(CUBE, "orders", "additivity", "additive").
+c_m_agg(CUBE, "orders", "count", "").
+c_display(CUBE, "m:orders", "{\"label\":\"Orders\",\"format\":\"number\",\"decimals\":0,\"good_when\":\"up\"}").
+c_metric(CUBE, "units").
+c_m_info(CUBE, "units", "description", "Units sold.").
+c_m_info(CUBE, "units", "value_type", "integer").
+c_m_info(CUBE, "units", "additivity", "additive").
+c_m_agg(CUBE, "units", "sum", "o.quantity").
+c_display(CUBE, "m:units", "{\"label\":\"Units\",\"format\":\"number\",\"decimals\":0}").
+c_metric(CUBE, "customers").
+c_m_info(CUBE, "customers", "description", "Distinct ordering customers.").
+c_m_info(CUBE, "customers", "value_type", "integer").
+c_m_info(CUBE, "customers", "additivity", "non_reaggregable").
+c_m_agg(CUBE, "customers", "count_distinct", "o.customer_id").
+c_display(CUBE, "m:customers", "{\"label\":\"Customers\",\"format\":\"number\",\"decimals\":0,\"good_when\":\"up\"}").
+c_metric(CUBE, "margin").
+c_m_info(CUBE, "margin", "description", "Revenue minus cost.").
+c_m_info(CUBE, "margin", "value_type", "number").
+c_m_info(CUBE, "margin", "additivity", "additive").
+c_m_sql(CUBE, "margin", "sum(o.revenue - o.cost)").
+c_display(CUBE, "m:margin", "{\"label\":\"Margin\",\"unit\":\"USD\",\"format\":\"currency\",\"good_when\":\"up\"}").
+c_metric(CUBE, "aov").
+c_m_info(CUBE, "aov", "description", "Average order value.").
+c_m_info(CUBE, "aov", "value_type", "number").
+c_m_info(CUBE, "aov", "additivity", "non_reaggregable").
+c_m_derived(CUBE, "aov", "{revenue} / nullif({orders}, 0)").
+c_display(CUBE, "m:aov", "{\"label\":\"Average order value\",\"unit\":\"USD\",\"format\":\"currency\",\"good_when\":\"up\"}").
+c_metric(CUBE, "margin_pct").
+c_m_info(CUBE, "margin_pct", "description", "Margin as a share of revenue.").
+c_m_info(CUBE, "margin_pct", "value_type", "number").
+c_m_info(CUBE, "margin_pct", "additivity", "non_reaggregable").
+c_m_derived(CUBE, "margin_pct", "{margin} / nullif({revenue}, 0)").
+c_display(CUBE, "m:margin_pct", "{\"label\":\"Margin %\",\"format\":\"percent\",\"decimals\":1,\"good_when\":\"up\"}").
+c_metric(CUBE, "return_rate").
+c_m_info(CUBE, "return_rate", "description", "Share of orders returned.").
+c_m_info(CUBE, "return_rate", "value_type", "number").
+c_m_info(CUBE, "return_rate", "additivity", "non_reaggregable").
+c_m_agg(CUBE, "return_rate", "avg", "o.returned").
+c_display(CUBE, "m:return_rate", "{\"label\":\"Return rate\",\"format\":\"percent\",\"decimals\":1,\"good_when\":\"down\"}").
+c_dimension(CUBE, "period").
+c_d_info(CUBE, "period", "description", "Order date, truncated to the `time_grain` parameter (default month).").
+c_d_info(CUBE, "period", "kind", "time").
+c_d_info(CUBE, "period", "value_type", "date").
+c_d_sql(CUBE, "period", "date_trunc('{time_grain}', o.order_date)").
+c_d_grain(CUBE, "period", "day").
+c_d_grain(CUBE, "period", "week").
+c_d_grain(CUBE, "period", "month").
+c_d_grain(CUBE, "period", "quarter").
+c_d_grain(CUBE, "period", "year").
+c_pa(CUBE, "d:period", "time_grain", "type", "string").
+c_pa(CUBE, "d:period", "time_grain", "default", "month").
+c_pa_enum(CUBE, "d:period", "time_grain", 0, "day").
+c_pa_enum(CUBE, "d:period", "time_grain", 1, "week").
+c_pa_enum(CUBE, "d:period", "time_grain", 2, "month").
+c_pa_enum(CUBE, "d:period", "time_grain", 3, "quarter").
+c_pa_enum(CUBE, "d:period", "time_grain", 4, "year").
+c_display(CUBE, "d:period", "{\"label\":\"Period\"}").
+c_dimension(CUBE, "region").
+c_d_info(CUBE, "region", "description", "Sales region.").
+c_d_info(CUBE, "region", "kind", "category").
+c_d_info(CUBE, "region", "value_type", "string").
+c_d_sql(CUBE, "region", "o.region").
+c_display(CUBE, "d:region", "{\"label\":\"Region\",\"order\":[\"EU\",\"North America\",\"APAC\",\"LATAM\"]}").
+c_dimension(CUBE, "country").
+c_d_info(CUBE, "country", "description", "ISO 3166-1 alpha-2 country of the customer.").
+c_d_info(CUBE, "country", "kind", "geo").
+c_d_info(CUBE, "country", "value_type", "string").
+c_d_sql(CUBE, "country", "o.country").
+c_display(CUBE, "d:country", "{\"label\":\"Country\"}").
+c_dimension(CUBE, "channel").
+c_d_info(CUBE, "channel", "description", "Sales channel.").
+c_d_info(CUBE, "channel", "kind", "category").
+c_d_info(CUBE, "channel", "value_type", "string").
+c_d_sql(CUBE, "channel", "o.channel").
+c_display(CUBE, "d:channel", "{\"label\":\"Channel\",\"colors\":{\"web\":\"#4e79a7\",\"app\":\"#f28e2b\",\"retail\":\"#59a14f\",\"partner\":\"#b07aa1\"}}").
+c_dimension(CUBE, "category").
+c_d_info(CUBE, "category", "description", "Product category.").
+c_d_info(CUBE, "category", "kind", "category").
+c_d_info(CUBE, "category", "value_type", "string").
+c_d_sql(CUBE, "category", "o.category").
+c_display(CUBE, "d:category", "{\"label\":\"Category\"}").
+c_dimension(CUBE, "segment").
+c_d_info(CUBE, "segment", "description", "Customer segment.").
+c_d_info(CUBE, "segment", "kind", "category").
+c_d_info(CUBE, "segment", "value_type", "string").
+c_d_sql(CUBE, "segment", "c.segment").
+c_d_join(CUBE, "segment", "customers").
+c_display(CUBE, "d:segment", "{\"label\":\"Segment\"}").
+c_dimension(CUBE, "customer").
+c_d_info(CUBE, "customer", "description", "One customer.").
+c_d_info(CUBE, "customer", "kind", "entity").
+c_d_info(CUBE, "customer", "value_type", "integer").
+c_d_sql(CUBE, "customer", "o.customer_id").
+c_display(CUBE, "d:customer", "{\"label\":\"Customer\"}").
+
+// ---- a modifier only rules can state --------------------------------------------
+// `weekend(m)`: the metric over orders placed on a Saturday or Sunday. A class-1
+// modifier restricts the rows an aggregate sees; the condition is dialect-specific,
+// so each dialect states its own.
+c_modifier(CUBE, "weekend", 1, "level", "The metric over weekend orders only.").
+mod_cond(J, "extract(isodow from o.order_date) >= 6") :- mcall(J, "weekend"), dia("duckdb").
+mod_cond(J, "toDayOfWeek(o.order_date) >= 6") :- mcall(J, "weekend"), dia("clickhouse").

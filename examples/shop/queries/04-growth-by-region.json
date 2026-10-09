@@ -1,0 +1,4 @@
+{"metrics": ["revenue"], "dimensions": ["region"],
+ "filters": {"field": "period", "op": "=", "value": "2025-12-01"},
+ "modifiers": [{"name": "delta_pct", "params": {"along": "period"}}],
+ "viz": {"y": ["delta_pct(revenue)"], "title": "Revenue growth, Dec 2025 vs Nov 2025"}}

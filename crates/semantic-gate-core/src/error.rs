@@ -1,13 +1,13 @@
 //! The closed error taxonomy and its envelope (`docs/spec/err.md`, brief
 //! §3.4).
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// One of the eighteen error codes the gate ever returns (`docs/spec/err.md`
 /// §3.4). Closed by construction: there is no variant for "anything else",
 /// so an out-of-vocabulary code cannot be built — the guarantee is the
 /// compiler's, not a test's.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ErrorCode {
     /// A requested metric is not in the namespace's declared vocabulary.

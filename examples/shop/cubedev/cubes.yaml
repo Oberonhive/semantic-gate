@@ -1,0 +1,6 @@
+# The shop cube set, imported from a cube.dev YAML data model.
+contract: "0.1"
+semtrans: [{cubedev: model.yml}]
+tables:
+  orders: ../data/orders.csv
+  customers: ../data/customers.csv

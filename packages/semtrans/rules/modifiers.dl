@@ -1,0 +1,314 @@
+// ============================================================================
+// Modifiers: resolving each call, checking it, and building its stage.
+//
+// The pipeline is a chain of nodes: `base` (filtered, grouped), then one stage
+// `s<j>` per call that changes rows or adds a column from the rows before it,
+// then `final`. Semantics:
+//
+//  class 2  prev_value / delta_abs / delta_pct  (MOD-003). cur and prev are
+//     windows of `along` buckets; each is its own aggregate leg over the source,
+//     joined to the presented rows by dimensions, so every metric kind (derived,
+//     distinct, two-stage) is right. Along not among the dimensions: anchor =
+//     the latest `along` bucket among the rows the filters keep (or `anchor`),
+//     cur = (anchor-range, anchor], prev = shifted by `shift`; the `along`
+//     filter is dropped for the legs (the widening). Along among the dimensions:
+//     the prev leg is the same query with the filter read `shift` grains later and
+//     the bucket moved `shift` grains later. delta_pct is null for an absent or
+//     zero prev; the divisor is a double.
+//  class 3  topn  ranks the members of `dimension` by `by` (evaluated over the
+//     filtered source, any aggregate) with ties to the member, ascending, and keeps
+//     n. rest: drop is a stage filtering the rows before it. rest: collapse
+//     relabels the dimension as `__rest__` inside every aggregate scope, so the
+//     rest row is aggregated from source (MOD-005) and the modifiers before and
+//     after it see the collapsed rows. The ranking sees dimension filters, not
+//     metric filters.
+//  class 3  rank  ROW_NUMBER over the result by `by`, ties to the dimension tuple,
+//     ascending: 1..n, no gaps.
+//  class 3  share  metric / SUM(metric) over the rows sharing `within` (default all),
+//     null when that total is 0.
+//  class 3  cumulative  running SUM along `along` (in the query), per combination of
+//     the other dimensions, over the presented rows.
+//  class 4  rolling  AVG (or SUM) of the metric's buckets over the n buckets ending
+//     at each one, per combination of the other dimensions; the filter on `along`
+//     is widened n-1 grains back so the first presented rows have full windows.
+//     Gaps are absent buckets, not zeros.
+//
+// A cube's own modifier is class 1 and fills hooks, per call j (see `mlit`, `mpv`):
+//     mod_cond(j, "sql")           the metric aggregates only the rows meeting this condition
+//     mod_wrap(j, prefix, suffix)  the aggregate is wrapped: prefix || aggregate || suffix
+// ============================================================================
+.decl mcall(j:number, name:symbol)
+.decl mkind(j:number, kind:symbol)
+.decl mpv(j:number, param:symbol, value:symbol)
+.decl mpn(j:number, param:symbol, n:number)
+.decl mlit(j:number, param:symbol, lit:symbol)
+.decl mtarget(j:number, i:number)
+.decl xcol(j:number, i:number, alias:symbol)
+.decl stagecall(j:number)
+.decl hasearlier(j:number)
+.decl prevnode(j:number, node:symbol)
+.decl mod_cond(j:number, cond:symbol)
+.decl mod_wrap(j:number, prefix:symbol, suffix:symbol)
+
+mcall(J, N) :- q_mod(J, N), rcube(C), modavail(C, N).
+refusal("unknown_modifier", CAT3("unknown modifier '", N, "'"), cat("modifiers: ", L)) :- q_mod(_, N), rcube(C), !modavail(C, N), joined(cat("mods:", C), L).
+mkind(J, "c2") :- mcall(J, N), b_family(N, "c2").
+mkind(J, "topn") :- mcall(J, "topn").
+mkind(J, "rank") :- mcall(J, "rank").
+mkind(J, "share") :- mcall(J, "share").
+mkind(J, "cum") :- mcall(J, "cumulative").
+mkind(J, "roll") :- mcall(J, "rolling").
+mkind(J, "cube") :- mcall(J, N), c_modifier(_, N, _, _, _).
+
+// ---- parameters: explicit, else declared default; checked against the declaration ------
+mpv(J, P, V) :- q_modp(J, P, 0, V, _, _, 0).
+mpv(J, P, V) :- mcall(J, N), x_pa(N, P, "default", V), !q_modp(J, P, _, _, _, _, _).
+mpv(J, "shift", V) :- mkind(J, "c2"), mpv(J, "range", V), !q_modp(J, "shift", _, _, _, _, _).
+mlit(J, P, L) :- q_modp(J, P, 0, _, L, _, 0).
+mpn(J, P, to_number(V)) :- mpv(J, P, V), match("[0-9]+", V).
+
+.decl mparr(j:number, param:symbol, i:number, value:symbol)
+mparr(J, P, I, V) :- q_modp(J, P, I, V, _, _, 1).
+
+refusal("invalid_params", CAT5("modifier '", N, "' has no param '", P, "'"), "") :- q_modp(J, P, _, _, _, _, _), mcall(J, N), !x_pa(N, P, _, _).
+refusal("invalid_params", CAT5("modifier '", N, "' needs param '", P, "'"), "") :-
+    mcall(J, N), x_pa(N, P, "required", "1"), !q_modp(J, P, _, _, _, _, _).
+refusal("invalid_params", CAT5("param '", P, "' of '", N, "' must be a scalar"), "") :-
+    q_modp(J, P, _, _, _, _, 1), mcall(J, N), x_pa(N, P, "type", T), T != "array".
+refusal("invalid_params", CAT5("param '", P, "' of '", N, "' must be an array"), "") :-
+    q_modp(J, P, _, _, _, _, 0), mcall(J, N), x_pa(N, P, "type", "array").
+refusal("invalid_params", CAT5("param '", P, "' of '", N, "' has the wrong type"), "") :-
+    q_modp(J, P, _, _, _, Tag, 0), mcall(J, N), x_pa(N, P, "type", T), T != "array", !okt(T, Tag).
+refusal("invalid_params", CAT5("param '", P, "' of '", N, "' has the wrong element type"), "") :-
+    q_modp(J, P, _, _, _, Tag, 1), mcall(J, N), x_pa(N, P, "items", T), !okt(T, Tag).
+refusal("invalid_params", CAT5("param '", P, "' of '", N, "' must be an integer"), "") :-
+    q_modp(J, P, 0, V, _, "num", 0), mcall(J, N), x_pa(N, P, "type", "integer"), !match("-?[0-9]+", V).
+refusal("invalid_params", CAT5("param '", P, "' of '", N, "' is not one of the allowed values"), "") :-
+    q_modp(J, P, 0, V, _, _, 0), mcall(J, N), x_pa_enum(N, P, _, _), !x_pa_enum(N, P, _, V).
+refusal("invalid_params", CAT5("param '", P, "' of '", N, "' is below its minimum"), "") :-
+    q_modp(J, P, 0, V, _, "num", 0), mcall(J, N), x_pa(N, P, "minimum", M), match("-?[0-9]+", V), match("-?[0-9]+", M), to_number(V) < to_number(M).
+refusal("invalid_params", CAT5("param '", P, "' of '", N, "' is above its maximum"), "") :-
+    q_modp(J, P, 0, V, _, "num", 0), mcall(J, N), x_pa(N, P, "maximum", M), match("-?[0-9]+", V), match("-?[0-9]+", M), to_number(V) > to_number(M).
+
+// ---- which metrics a column-producing call applies to ----------------------------------
+mtarget(J, I) :- mcall(J, _), !mkind(J, "topn"), !q_modp(J, "metrics", _, _, _, _, _), qm(I, _).
+mtarget(J, I) :- mparr(J, "metrics", _, M), qm(I, M).
+refusal("invalid_params", CAT5("'metrics' of '", N, "' names '", M, "', which is not a query metric"), "") :-
+    mparr(J, "metrics", _, M), mcall(J, N), !qm(_, M).
+refusal("non_additive_violation", CAT5("'", Mod, "' does not apply to '", N, "'"), cat("it needs a metric with additivity: ", Ok)) :-
+    mtarget(J, I), qm(I, N), mcall(J, Mod), rcube(C), c_m_info(C, N, "additivity", A), !x_req(Mod, A), joined(cat("req:", Mod), Ok).
+item(cat("req:", M), R, A) :- x_req(M, A), R = count : { x_req(M, A2), A2 < A }.
+refusal("non_additive_violation", CAT5("rolling agg 'sum' does not apply to '", N, "' (", A, ")"), "use agg 'avg'") :-
+    mtarget(J, I), qm(I, N), mpv(J, "agg", "sum"), mkind(J, "roll"), rcube(C), c_m_info(C, N, "additivity", A), A != "additive".
+
+xcol(J, I, CAT4("x", to_string(J), "_", to_string(I))) :- mtarget(J, I).
+scol("base", A) :- xcol(J, I, A), mkind(J, "cube").
+ocx(2000 + J * 100 + I, CAT4(M, "(", N, ")"), A) :- xcol(J, I, A), mcall(J, M), qm(I, N).
+ocolv(2000 + J * 100 + I, CAT4(M, "(", N, ")"), "metric", N, M, T, "") :- xcol(J, I, _), mcall(J, M), qm(I, N), xvt(J, I, T).
+
+.decl xvt(j:number, i:number, t:symbol)
+.decl mvt(i:number, t:symbol)
+mvt(I, T) :- qm(I, N), rcube(C), c_m_info(C, N, "value_type", T).
+mvt(I, "number") :- qm(I, N), rcube(C), !c_m_info(C, N, "value_type", _).
+xvt(J, I, "number") :- xcol(J, I, _), mcall(J, M), x_mod(M, _, O, _, _), O = "ratio".
+xvt(J, I, "number") :- xcol(J, I, _), mcall(J, M), x_mod(M, _, O, _, _), O = "share".
+xvt(J, I, "integer") :- xcol(J, I, _), mcall(J, M), x_mod(M, _, O, _, _), O = "rank".
+xvt(J, I, T) :- xcol(J, I, _), mcall(J, M), x_mod(M, _, O, _, _), O != "ratio", O != "share", O != "rank", mvt(I, T), !mpv(J, "agg", "avg").
+xvt(J, I, "number") :- xcol(J, I, _), mkind(J, "roll"), mpv(J, "agg", "avg").
+
+// ---- the chain -----------------------------------------------------------------------
+stagecall(J) :- mkind(J, "c2").
+stagecall(J) :- mkind(J, "rank").
+stagecall(J) :- mkind(J, "share").
+stagecall(J) :- mkind(J, "cum").
+stagecall(J) :- mkind(J, "roll").
+stagecall(J) :- mkind(J, "topn"), mpv(J, "rest", "drop").
+hasearlier(J) :- stagecall(J), stagecall(Q), Q < J.
+prevnode(J, "base") :- stagecall(J), !hasearlier(J).
+prevnode(J, cat("s", to_string(K))) :- stagecall(J), hasearlier(J), K = max Q : { stagecall(Q), Q < J }.
+lastnode("base") :- rcube(_), !stagecall(_).
+lastnode(cat("s", to_string(K))) :- K = max J : { stagecall(J) }.
+
+// every stage offers the columns before it and its own
+node(cat("s", to_string(J)), 1000 * (J + 2) + 500) :- stagecall(J).
+nfrom(cat("s", to_string(J)), cat(P, " AS p")) :- stagecall(J), prevnode(J, P).
+scol(cat("s", to_string(J)), A) :- stagecall(J), prevnode(J, P), scol(P, A).
+scol(cat("s", to_string(J)), A) :- stagecall(J), xcol(J, _, A).
+ncol(cat("s", to_string(J)), R, A, cat("p.", A)) :- stagecall(J), prevnode(J, P), scol(P, A), R = count : { scol(P, A2), A2 < A }.
+ncol(cat("s", to_string(J)), 5000 + I, A, E) :- stagecall(J), xcol(J, I, A), xexpr(J, I, E).
+.decl xexpr(j:number, i:number, sql:symbol)
+.decl dblfn(dialect:symbol, pre:symbol, suf:symbol)
+dblfn("duckdb", "CAST(", " AS DOUBLE)").
+dblfn("clickhouse", "toFloat64(", ")").
+.decl strfn(dialect:symbol, pre:symbol, suf:symbol)
+strfn("duckdb", "CAST(", " AS VARCHAR)").
+strfn("clickhouse", "toString(", ")").
+
+// dimension equality between the previous stage `p` and a joined node
+.decl dimeq(node:symbol, at:number, q:symbol)
+njoin_on(N, R, I, CAT5("p.d", to_string(I), " IS NOT DISTINCT FROM ", Q, cat(".d", to_string(I)))) :- dimeq(N, R, Q), qd(I, _).
+njoin_on(N, R, 0, "1 = 1") :- dimeq(N, R, _), !qd(_, _).
+
+// ---- class 2 ------------------------------------------------------------------------
+.decl c2along(j:number, a:symbol)
+.decl c2bucket(j:number, ia:number)
+.decl cidx(j:number, sql:symbol)               // bucket number of `along` over the source
+.decl anchorlit(j:number, sql:symbol)
+
+c2along(J, A) :- mkind(J, "c2"), mpv(J, "along", A).
+refusal("invalid_params", CAT3("'along' must name a date dimension: '", A, "' is not one"), cat("date dimensions: ", L)) :-
+    c2along(_, A), rcube(C), !tdim(A), joined(cat("tdims:", C), L).
+.decl tdim(name:symbol)
+tdim(D) :- dkind(D, "time").
+item(cat("tdims:", C), R, D) :- rcube(C), tdim(D), R = count : { tdim(D2), D2 < D }.
+uses_dim(A) :- c2along(_, A), tdim(A).
+need_grain(A) :- c2along(_, A), tdim(A).
+c2bucket(J, IA) :- c2along(J, A), qd(IA, A).
+refusal("invalid_params", "'anchor' must be a date, YYYY-MM-DD", "") :- mkind(J, "c2"), mpv(J, "anchor", V), !match("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]", V).
+
+tvar(cat("S", to_string(J)), "d", "shift", A, N) :- c2along(J, A), c2bucket(J, _), mpn(J, "shift", N).
+tvar(cat("X", to_string(J)), "d", "true", A, 0) :- c2along(J, A), !c2bucket(J, _).
+
+cidx(J, E) :- dia("duckdb"), c2along(J, A), dexpr(A, X), dgrain(A, G), E = IDX_DUCKDB(G, X).
+cidx(J, E) :- dia("clickhouse"), c2along(J, A), dexpr(A, X), dgrain(A, G), E = IDX_CLICKHOUSE(G, X).
+anchorlit(J, CAT3("CAST(", L, " AS DATE)")) :- dia("duckdb"), mpv(J, "anchor", _), mlit(J, "anchor", L).
+anchorlit(J, CAT3("toDate(", L, ")")) :- dia("clickhouse"), mpv(J, "anchor", _), mlit(J, "anchor", L).
+
+// bucket case: one prev leg
+scope(cat("w", to_string(J)), 1000 * (J + 2) + 20) :- c2bucket(J, _).
+sdim(cat("w", to_string(J)), I, E) :- c2bucket(J, IA), dsel(I, E), I != IA.
+sdim(cat("w", to_string(J)), IA, E) :- c2bucket(J, IA), c2along(J, A), mpn(J, "shift", N), dshift(A, N, E).
+sm(cat("w", to_string(J)), cat("m", to_string(I)), N) :- c2bucket(J, _), mtarget(J, I), qm(I, N).
+swhere(cat("w", to_string(J)), 0, T) :- c2bucket(J, _), wtree(cat("S", to_string(J)), T).
+
+// window case: an anchor and two legs
+scope(cat("a", to_string(J)), 1000 * (J + 2)) :- c2along(J, _), !c2bucket(J, _).
+swhere(cat("a", to_string(J)), 0, T) :- c2along(J, _), !c2bucket(J, _), !mpv(J, "anchor", _), wtree("D", T).
+smet(cat("a", to_string(J)), "a", CAT3("max(", E, ")")) :- c2along(J, _), !c2bucket(J, _), !mpv(J, "anchor", _), cidx(J, E).
+smet(cat("a", to_string(J)), "a", CAT3("max(", E, ")")) :- c2along(J, _), !c2bucket(J, _), anchorlit(J, L), mpv(J, "anchor", _),
+    dia("duckdb"), c2along(J, A), dgrain(A, G), E = IDX_DUCKDB(G, L).
+smet(cat("a", to_string(J)), "a", CAT3("max(", E, ")")) :- c2along(J, _), !c2bucket(J, _), anchorlit(J, L), mpv(J, "anchor", _),
+    dia("clickhouse"), c2along(J, A), dgrain(A, G), E = IDX_CLICKHOUSE(G, L).
+.decl leg(sid:symbol, j:number, kind:symbol)       // kind cur | prev
+leg(cat("c", to_string(J)), J, "cur") :- c2along(J, _), !c2bucket(J, _).
+leg(cat("v", to_string(J)), J, "prev") :- c2along(J, _), !c2bucket(J, _).
+scope(S, 1000 * (J + 2) + 10) :- leg(S, J, "cur").
+scope(S, 1000 * (J + 2) + 20) :- leg(S, J, "prev").
+sdim(S, I, E) :- leg(S, _, _), dsel(I, E).
+sm(S, cat("m", to_string(I)), N) :- leg(S, J, _), mtarget(J, I), qm(I, N).
+sextra(S, 500, CAT3("CROSS JOIN a", to_string(J), " AS an")) :- leg(S, J, _).
+swhere(S, 0, T) :- leg(S, J, _), wtree(cat("X", to_string(J)), T).
+swhere(S, 1, CAT5(E, " > an.a - ", R, " AND ", cat(E, cat(" <= an.a", "")))) :- leg(S, J, "cur"), cidx(J, E), mpv(J, "range", R).
+swhere(S, 1, CAT7(E, " > an.a - ", R, " - ", Sh, " AND ", cat(E, cat(" <= an.a - ", Sh)))) :- leg(S, J, "prev"), cidx(J, E), mpv(J, "range", R), mpv(J, "shift", Sh).
+
+// the stage
+njoin(cat("s", to_string(J)), 10, CAT3("LEFT JOIN w", to_string(J), " AS q")) :- c2bucket(J, _).
+dimeq(cat("s", to_string(J)), 10, "q") :- c2bucket(J, _).
+njoin(cat("s", to_string(J)), 10, CAT3("LEFT JOIN c", to_string(J), " AS c")) :- c2along(J, _), !c2bucket(J, _).
+njoin(cat("s", to_string(J)), 20, CAT3("LEFT JOIN v", to_string(J), " AS q")) :- c2along(J, _), !c2bucket(J, _).
+dimeq(cat("s", to_string(J)), 10, "c") :- c2along(J, _), !c2bucket(J, _).
+dimeq(cat("s", to_string(J)), 20, "q") :- c2along(J, _), !c2bucket(J, _).
+
+.decl curcol(j:number, i:number, sql:symbol)
+curcol(J, I, cat("p.m", to_string(I))) :- c2bucket(J, _), mtarget(J, I).
+curcol(J, I, cat("c.m", to_string(I))) :- c2along(J, _), !c2bucket(J, _), mtarget(J, I).
+xexpr(J, I, cat("q.m", to_string(I))) :- mcall(J, "prev_value"), mtarget(J, I).
+xexpr(J, I, CAT3(C, " - q.m", to_string(I))) :- mcall(J, "delta_abs"), curcol(J, I, C).
+.decl qm_(j:number, i:number, q:symbol)
+qm_(J, I, cat("q.m", to_string(I))) :- mtarget(J, I).
+xexpr(J, I, CAT5("CASE WHEN ", Q, " IS NULL OR ", Q, cat(" = 0 THEN NULL ELSE (", cat(C, cat(" - ", cat(Q, cat(") / ", cat(Pre, cat(Q, cat(Suf, " END")))))))))) :-
+    mcall(J, "delta_pct"), curcol(J, I, C), qm_(J, I, Q), dia(D), dblfn(D, Pre, Suf).
+
+// ---- topn --------------------------------------------------------------------------
+.decl tn(j:number, dim:symbol, idx:number)
+.decl nontime(name:symbol)
+nontime(D) :- qd(_, D), !dkind(D, "time").
+.decl tdimc(j:number, dim:symbol)
+tdimc(J, D) :- mkind(J, "topn"), mpv(J, "dimension", D).
+tdimc(J, D) :- mkind(J, "topn"), !q_modp(J, "dimension", _, _, _, _, _), nontime(D), 1 = count : { nontime(X) }.
+tn(J, D, I) :- tdimc(J, D), qd(I, D).
+refusal("invalid_params", "topn needs `dimension`: the query has no single non-time dimension", "") :- mkind(J, "topn"), !tdimc(J, _).
+refusal("invalid_params", CAT3("topn `dimension` '", D, "' is not a query dimension"), "") :- tdimc(_, D), !qd(_, D).
+refusal("unknown_metric", CAT3("unknown metric '", M, "' in topn `by`"), cat("known metrics: ", L)) :-
+    mkind(J, "topn"), mpv(J, "by", M), rcube(C), !c_metric(C, M), joined(cat("metrics:", C), L).
+mneed("", M) :- mkind(J, "topn"), mpv(J, "by", M), rcube(C), c_metric(C, M).
+
+scope(cat("r", to_string(J)), 10 + 20 * J) :- tn(J, _, _).
+sdim(cat("r", to_string(J)), 0, E) :- tn(J, D, _), dexpr(D, E).
+sm(cat("r", to_string(J)), "m0", M) :- tn(J, _, _), mpv(J, "by", M).
+swhere(cat("r", to_string(J)), 0, T) :- tn(J, _, _), wtree("D", T).
+node(cat("t", to_string(J)), 15 + 20 * J) :- tn(J, _, _).
+nfrom(cat("t", to_string(J)), cat("r", to_string(J))) :- tn(J, _, _).
+ncol(cat("t", to_string(J)), 0, "k", "d0") :- tn(J, _, _).
+norder(cat("t", to_string(J)), 0, "m0 DESC NULLS LAST") :- tn(J, _, _).
+norder(cat("t", to_string(J)), 1, "d0 ASC NULLS LAST") :- tn(J, _, _).
+nlimit(cat("t", to_string(J)), N) :- tn(J, _, _), mpn(J, "n", N).
+nwhere(cat("s", to_string(J)), 0, CAT5("p.d", to_string(I), " IN (SELECT k FROM t", to_string(J), ")")) :- tn(J, _, I), mpv(J, "rest", "drop").
+collapsed(D, CAT7("CASE WHEN ", E, " IN (SELECT k FROM t", to_string(J), ") THEN ", S, " ELSE '__rest__' END")) :-
+    tn(J, D, _), mpv(J, "rest", "collapse"), dexpr(D, E), dia(Di), strfn(Di, Pre, Suf), S = CAT3(Pre, E, Suf).
+
+// ---- rank, share, cumulative ------------------------------------------------------------
+item(cat("rk:", to_string(J)), I, CAT3("p.d", to_string(I), " ASC NULLS LAST")) :- mkind(J, "rank"), qd(I, _).
+.decl rbase(j:number, text:symbol)
+rbase(J, CAT5("p.m", to_string(I), " ", Dir, " NULLS LAST")) :- mkind(J, "rank"), mpv(J, "by", B), qm(I, B), mpv(J, "dir", Dir0), Dir = Dir0.
+refusal("invalid_params", CAT3("rank `by` '", B, "' is not a query metric"), "") :- mkind(J, "rank"), mpv(J, "by", B), !qm(_, B).
+xexpr(J, I, CAT3("ROW_NUMBER() OVER (ORDER BY ", cat(T, ", "), cat(L, ")"))) :- mkind(J, "rank"), mtarget(J, I), rbase(J, T), joined(cat("rk:", to_string(J)), L).
+xexpr(J, I, CAT3("ROW_NUMBER() OVER (ORDER BY ", T, ")")) :- mkind(J, "rank"), mtarget(J, I), rbase(J, T), !has_item(cat("rk:", to_string(J))).
+
+item(cat("sp:", to_string(J)), K, cat("p.d", to_string(I))) :- mkind(J, "share"), mparr(J, "within", K, D), qd(I, D).
+refusal("invalid_params", CAT3("share `within` names '", D, "', which is not a query dimension"), "") :- mkind(J, "share"), mparr(J, "within", _, D), !qd(_, D).
+xexpr(J, I, CAT7("p.m", to_string(I), " / NULLIF(SUM(p.m", to_string(I), ") OVER (PARTITION BY ", L, "), 0)")) :-
+    mkind(J, "share"), mtarget(J, I), joined(cat("sp:", to_string(J)), L).
+xexpr(J, I, CAT5("p.m", to_string(I), " / NULLIF(SUM(p.m", to_string(I), ") OVER (), 0)")) :- mkind(J, "share"), mtarget(J, I), !has_item(cat("sp:", to_string(J))).
+
+.decl walong(j:number, a:symbol, ia:number)
+walong(J, A, IA) :- mkind(J, "cum"), mpv(J, "along", A), qd(IA, A).
+walong(J, A, IA) :- mkind(J, "roll"), mpv(J, "along", A), qd(IA, A).
+refusal("invalid_params", CAT3("'along' '", A, "' must be a date dimension of the query"), "") :- mkind(J, "cum"), mpv(J, "along", A), !walong(J, A, _).
+refusal("invalid_params", CAT3("'along' '", A, "' must be a date dimension of the query"), "") :- mkind(J, "roll"), mpv(J, "along", A), !walong(J, A, _).
+refusal("invalid_params", CAT3("'along' '", A, "' must be a date dimension of the query"), "") :- walong(_, A, _), !tdim(A).
+item(cat("wp:", to_string(J)), I, cat("p.d", to_string(I))) :- walong(J, _, IA), mkind(J, "cum"), qd(I, _), I != IA.
+xexpr(J, I, CAT7("SUM(p.m", to_string(I), ") OVER (PARTITION BY ", L, " ORDER BY p.d", to_string(IA), " ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)")) :-
+    mkind(J, "cum"), mtarget(J, I), walong(J, _, IA), joined(cat("wp:", to_string(J)), L).
+xexpr(J, I, CAT5("SUM(p.m", to_string(I), ") OVER (ORDER BY p.d", to_string(IA), " ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)")) :-
+    mkind(J, "cum"), mtarget(J, I), walong(J, _, IA), !has_item(cat("wp:", to_string(J))).
+
+// ---- rolling ------------------------------------------------------------------------
+uses_dim(A) :- walong(_, A, _).
+need_grain(A) :- walong(_, A, _).
+tvar(cat("R", to_string(J)), "d", "roll", A, N) :- mkind(J, "roll"), walong(J, A, _), mpn(J, "n", N).
+scope(cat("l", to_string(J)), 1000 * (J + 2)) :- mkind(J, "roll").
+sdim(cat("l", to_string(J)), I, E) :- mkind(J, "roll"), dsel(I, E).
+sm(cat("l", to_string(J)), cat("m", to_string(I)), N) :- mkind(J, "roll"), mtarget(J, I), qm(I, N).
+swhere(cat("l", to_string(J)), 0, T) :- mkind(J, "roll"), wtree(cat("R", to_string(J)), T).
+node(cat("lw", to_string(J)), 1000 * (J + 2) + 100) :- mkind(J, "roll").
+nfrom(cat("lw", to_string(J)), cat("l", to_string(J))) :- mkind(J, "roll").
+ncol(cat("lw", to_string(J)), I, cat("d", to_string(I)), cat("d", to_string(I))) :- mkind(J, "roll"), qd(I, _).
+item(cat("lp:", to_string(J)), I, cat("d", to_string(I))) :- walong(J, _, IA), mkind(J, "roll"), qd(I, _), I != IA.
+.decl widx(j:number, sql:symbol)
+widx(J, E) :- dia("duckdb"), walong(J, A, IA), dgrain(A, G), E = IDX_DUCKDB(G, cat("d", to_string(IA))).
+widx(J, E) :- dia("clickhouse"), walong(J, A, IA), dgrain(A, G), E = IDX_CLICKHOUSE(G, cat("d", to_string(IA))).
+.decl rfn(j:number, fn:symbol)
+rfn(J, "AVG") :- mkind(J, "roll"), mpv(J, "agg", "avg").
+rfn(J, "SUM") :- mkind(J, "roll"), mpv(J, "agg", "sum").
+.decl rwin(j:number, i:number, sql:symbol)
+rwin(J, I, CAT5(F, "(m", to_string(I), ") OVER (PARTITION BY ", cat(L, cat(" ORDER BY ", cat(W, cat(" RANGE BETWEEN ", cat(to_string(N - 1), " PRECEDING AND CURRENT ROW)"))))))) :-
+    mkind(J, "roll"), mtarget(J, I), rfn(J, F), joined(cat("lp:", to_string(J)), L), widx(J, W), mpn(J, "n", N).
+rwin(J, I, CAT5(F, "(m", to_string(I), ") OVER (ORDER BY ", cat(W, cat(" RANGE BETWEEN ", cat(to_string(N - 1), " PRECEDING AND CURRENT ROW)"))))) :-
+    mkind(J, "roll"), mtarget(J, I), rfn(J, F), !has_item(cat("lp:", to_string(J))), widx(J, W), mpn(J, "n", N).
+ncol(cat("lw", to_string(J)), 5000 + I, cat("y", to_string(I)), E) :- rwin(J, I, E).
+njoin(cat("s", to_string(J)), 10, CAT3("LEFT JOIN lw", to_string(J), " AS q")) :- mkind(J, "roll").
+dimeq(cat("s", to_string(J)), 10, "q") :- mkind(J, "roll").
+xexpr(J, I, cat("q.y", to_string(I))) :- mkind(J, "roll"), mtarget(J, I).
+
+// ---- a cube's own modifier ----------------------------------------------------------------
+.decl mcond(j:number, cond:symbol)
+.decl cx(j:number, i:number, sql:symbol)
+mcond(J, C) :- mkind(J, "cube"), mod_cond(J, C).
+mcond(J, "") :- mkind(J, "cube"), !mod_cond(J, _).
+mneed(C, N) :- mkind(J, "cube"), mtarget(J, I), mcond(J, C), qm(I, N).
+cx(J, I, E) :- mkind(J, "cube"), mtarget(J, I), mcond(J, C), qm(I, N), mexpr(C, N, E).
+smet("base", A, E) :- cx(J, I, E0), xcol(J, I, A), !mod_wrap(J, _, _), E = E0.
+smet("base", A, CAT3(Pre, E0, Suf)) :- cx(J, I, E0), xcol(J, I, A), mod_wrap(J, Pre, Suf).
+refusal("invalid_composition", CAT5("'", M, "' cannot restrict '", N, "': it is not a plain aggregate"), "") :-
+    mkind(J, "cube"), mod_cond(J, C), C != "", mtarget(J, I), qm(I, N), mcall(J, M), !mexpr(C, N, _).

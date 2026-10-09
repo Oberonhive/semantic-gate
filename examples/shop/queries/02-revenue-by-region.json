@@ -1,0 +1,1 @@
+{"metrics": ["revenue"], "dimensions": ["period", "region"], "params": {"time_grain": "quarter"}}

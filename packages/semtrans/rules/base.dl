@@ -1,0 +1,19 @@
+// ============================================================================
+// The base result: the query's dimensions and metrics, filtered, grouped. Every
+// modifier stage reads it, directly or through the stage before.
+// ============================================================================
+.decl dsel(i:number, sql:symbol)               // query dimension i as every scope selects it
+.decl collapsed(dim:symbol, sql:symbol)        // a dimension relabelled by topn rest: collapse
+.decl scol(node:symbol, alias:symbol)          // columns a stage node offers its successor
+
+dsel(I, E) :- qd(I, D), dexpr(D, E), !collapsed(D, _).
+dsel(I, E) :- qd(I, D), collapsed(D, E).
+
+scope("base", 1000) :- rcube(_).
+sdim("base", I, E) :- dsel(I, E).
+sm("base", cat("m", to_string(I)), N) :- qm(I, N).
+swhere("base", 0, T) :- wtree("D", T).
+shaving("base", 0, T) :- wtree("H", T).
+
+scol("base", cat("d", to_string(I))) :- qd(I, _).
+scol("base", cat("m", to_string(I))) :- qm(I, _).

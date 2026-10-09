@@ -1,0 +1,7 @@
+# The shop cube set, authored as Datalog facts (shop.dl): the same cube as ../yaml,
+# plus one modifier only rules can state. The same queries must give the same rows.
+contract: "0.1"
+semtrans: [shop.dl]
+tables:
+  orders: ../data/orders.csv
+  customers: ../data/customers.csv

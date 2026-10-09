@@ -1,0 +1,157 @@
+// ============================================================================
+// The filter tree. A predicate on a dimension filters before aggregation
+// (WHERE), a predicate on a metric after it (HAVING); a tree that mixes the two
+// under `or` / `not` cannot be split and is refused.
+//
+// The tree is rendered once per *variant* V — the same tree with its
+// dimension-side or metric-side leaves dropped (`1 = 1`), and, for the window
+// modifiers that need neighbours of the filtered rows, with the leaves on the
+// `along` axis moved:
+//     D  every dimension leaf, metric leaves dropped          (WHERE)
+//     H  every metric leaf, dimension leaves dropped          (HAVING)
+//     mode shift n  `along` read n grains later: the rows whose successor, n grains on, passes
+//     mode true     `along` leaves dropped: the window is bounded elsewhere
+//     mode roll n   `along` passing now or at any of the next n-1 grains
+// Layers that need a variant declare it with tvar(V, part, mode, along, n).
+// ============================================================================
+.decl tvar(v:symbol, part:symbol, mode:symbol, along:symbol, n:number)     // part d | h; mode keep | true | shift | roll
+.decl fchild(parent:number, idx:number, child:number)
+.decl nchild(id:number, n:number)
+.decl fkind(id:number, kind:symbol)
+.decl fdim(id:number)
+.decl fmet(id:number)
+.decl fop(op:symbol)
+.decl cmp_op(op:symbol)
+.decl fnroot(id:number)
+
+tvar("D", "d", "keep", "", 0) :- q_dialect(_).
+tvar("H", "h", "keep", "", 0) :- q_dialect(_).
+
+fop("="). fop("!="). fop(">"). fop(">="). fop("<"). fop("<="). fop("in"). fop("not_in"). fop("between").
+fop("is_null"). fop("is_not_null"). fop("contains"). fop("starts_with").
+cmp_op("="). cmp_op("!="). cmp_op(">"). cmp_op(">="). cmp_op("<"). cmp_op("<=").
+
+fchild(P, I, C) :- q_fnode(C, _, P, I), P >= 0.
+nchild(P, N) :- q_fnode(P, K, _, _), K != "pred", N = count : { fchild(P, _, _) }.
+fnroot(I) :- q_fnode(I, _, -1, _).
+fkind(I, "dim") :- q_fpred(I, F, _), rcube(C), c_dimension(C, F).
+fkind(I, "met") :- q_fpred(I, F, _), rcube(C), c_metric(C, F), !c_dimension(C, F).
+fdim(I) :- fkind(I, "dim").
+fmet(I) :- fkind(I, "met").
+fdim(P) :- fchild(P, _, C), fdim(C).
+fmet(P) :- fchild(P, _, C), fmet(C).
+uses_dim(F) :- q_fpred(I, F, _), fkind(I, "dim").
+mneed("", F) :- q_fpred(I, F, _), fkind(I, "met").
+
+// ---- refusals ----------------------------------------------------------------
+.decl fmix_op(kind:symbol)
+.decl nval(id:number, n:number)
+fmix_op("or"). fmix_op("not").
+nval(I, N) :- q_fpred(I, _, _), N = count : { q_fval(I, _, _, _, _, _) }.
+
+refusal("filter_op_not_allowed", CAT3("operator '", Op, "' is not in the vocabulary"), "operators: =, !=, >, >=, <, <=, in, not_in, between, is_null, is_not_null, contains, starts_with") :-
+    q_fpred(_, _, Op), !fop(Op).
+refusal("unknown_dimension", CAT3("filter field '", F, "' is neither a dimension nor a metric"), cat("dimensions of the cube: ", L)) :-
+    q_fpred(I, F, _), rcube(C), !fkind(I, _), !c_dimension(_, F), !c_metric(_, F), joined(cat("dims:", C), L).
+refusal("invalid_composition", CAT5("filter field '", F, "' is not defined for cube '", C, "'"), cat("dimensions of this cube: ", L)) :-
+    q_fpred(I, F, _), rcube(C), !fkind(I, _), c_dimension(_, F), joined(cat("dims:", C), L).
+refusal("invalid_composition", CAT5("filter field '", F, "' is not defined for cube '", C, "'"), cat("dimensions of this cube: ", L)) :-
+    q_fpred(I, F, _), rcube(C), !fkind(I, _), c_metric(_, F), joined(cat("dims:", C), L).
+refusal("invalid_composition", "a filter mixes dimensions and metrics under `or` or `not`", "combine them with `and` only") :-
+    q_fnode(I, K, _, _), fmix_op(K), fdim(I), fmet(I).
+refusal("invalid_params", CAT3("operator '", Op, "' takes one scalar value"), "") :-
+    q_fpred(I, _, Op), cmp_op(Op), !one_scalar(I).
+refusal("invalid_params", CAT3("operator '", Op, "' takes one scalar value"), "") :-
+    q_fpred(I, _, Op), string_op(Op), !one_scalar(I).
+refusal("invalid_params", CAT3("operator '", Op, "' takes a non-empty array"), "") :-
+    q_fpred(I, _, Op), list_op(Op), !an_array(I).
+refusal("invalid_params", "operator 'between' takes [low, high]", "") :-
+    q_fpred(I, _, "between"), !pair(I).
+refusal("invalid_params", CAT3("operator '", Op, "' takes no value"), "") :-
+    q_fpred(I, _, Op), nullary_op(Op), nval(I, N), N > 0.
+refusal("invalid_params", CAT3("filter on '", F, "' holds a value that is not a string, number or boolean"), "use `is_null` to test for null") :-
+    q_fpred(I, F, _), q_fval(I, _, _, _, T, _), bad_type(T).
+refusal("filter_op_not_allowed", CAT5("operator '", Op, "' needs a string, '", F, "' is not one"), "use a comparison, `in` or `between`") :-
+    q_fpred(I, F, Op), string_op(Op), fkind(I, "met").
+refusal("filter_op_not_allowed", CAT5("operator '", Op, "' needs a string, '", F, "' is not one"), "use a comparison, `in` or `between`") :-
+    q_fpred(I, F, Op), string_op(Op), fkind(I, "dim"), dvtype(F, T), T != "string".
+
+.decl string_op(op:symbol)
+.decl list_op(op:symbol)
+.decl nullary_op(op:symbol)
+.decl bad_type(t:symbol)
+.decl one_scalar(id:number)
+.decl an_array(id:number)
+.decl pair(id:number)
+string_op("contains"). string_op("starts_with").
+list_op("in"). list_op("not_in").
+nullary_op("is_null"). nullary_op("is_not_null").
+bad_type("obj"). bad_type("null").
+one_scalar(I) :- q_fval(I, 0, _, _, _, 0), nval(I, 1).
+an_array(I) :- q_fval(I, 0, _, _, _, 1).
+pair(I) :- q_fval(I, 0, _, _, _, 1), nval(I, 2).
+
+// ---- value lists -------------------------------------------------------------
+.decl vlist(id:number, text:symbol)
+item(cat("v:", to_string(I)), K, L) :- q_fval(I, K, _, L, _, 1).
+vlist(I, T) :- q_fpred(I, _, _), joined(cat("v:", to_string(I)), T).
+
+// ---- one leaf under one variant: the left-hand side, then the predicate ---------
+// k is the position inside a `roll` (0 elsewhere): leaf text k is the leaf read k grains later.
+.decl plhs(v:symbol, id:number, k:number, lhs:symbol)
+.decl ptext(v:symbol, id:number, k:number, text:symbol)
+.decl kk(v:symbol, k:number)
+.decl racc(v:symbol, id:number, k:number, text:symbol)
+.decl dshift_req(dim:symbol, n:number)
+.decl dshift(dim:symbol, n:number, sql:symbol)
+
+kk(V, 0) :- tvar(V, _, "roll", _, _).
+kk(V, K+1) :- kk(V, K), tvar(V, _, "roll", _, N), K+1 < N.
+dshift_req(A, N) :- tvar(_, _, "shift", A, N).
+dshift_req(A, K) :- tvar(V, _, "roll", A, _), kk(V, K).
+
+// dimension leaves
+plhs(V, I, 0, E) :- tvar(V, "d", "keep", _, _), fkind(I, "dim"), q_fpred(I, F, _), dexpr(F, E).
+plhs(V, I, 0, E) :- tvar(V, "d", M, A, _), M != "keep", fkind(I, "dim"), q_fpred(I, F, _), F != A, dexpr(F, E).
+plhs(V, I, 0, E) :- tvar(V, "d", "shift", A, N), q_fpred(I, A, _), dshift(A, N, E).
+plhs(V, I, K, E) :- tvar(V, "d", "roll", A, _), q_fpred(I, A, _), kk(V, K), dshift(A, K, E).
+// metric leaves
+plhs(V, I, 0, E) :- tvar(V, "h", _, _, _), fkind(I, "met"), q_fpred(I, F, _), mexpr("", F, E).
+
+ptext(V, I, K, CAT6("(", L, " ", Op, " ", cat(Lit, ")"))) :- plhs(V, I, K, L), q_fpred(I, _, Op), cmp_op(Op), q_fval(I, 0, _, Lit, _, 0).
+ptext(V, I, K, CAT5("(", L, " IN (", Ls, "))")) :- plhs(V, I, K, L), q_fpred(I, _, "in"), vlist(I, Ls).
+ptext(V, I, K, CAT5("(", L, " NOT IN (", Ls, "))")) :- plhs(V, I, K, L), q_fpred(I, _, "not_in"), vlist(I, Ls).
+ptext(V, I, K, CAT7("(", L, " BETWEEN ", A, " AND ", B, ")")) :- plhs(V, I, K, L), q_fpred(I, _, "between"), q_fval(I, 0, _, A, _, 1), q_fval(I, 1, _, B, _, 1).
+ptext(V, I, K, CAT3("(", L, " IS NULL)")) :- plhs(V, I, K, L), q_fpred(I, _, "is_null").
+ptext(V, I, K, CAT3("(", L, " IS NOT NULL)")) :- plhs(V, I, K, L), q_fpred(I, _, "is_not_null").
+ptext(V, I, K, CAT5("contains(", L, ", ", Lit, ")")) :- dia("duckdb"), plhs(V, I, K, L), q_fpred(I, _, "contains"), q_fval(I, 0, _, Lit, _, 0).
+ptext(V, I, K, CAT5("starts_with(", L, ", ", Lit, ")")) :- dia("duckdb"), plhs(V, I, K, L), q_fpred(I, _, "starts_with"), q_fval(I, 0, _, Lit, _, 0).
+ptext(V, I, K, CAT5("(positionCaseSensitive(", L, ", ", Lit, ") > 0)")) :- dia("clickhouse"), plhs(V, I, K, L), q_fpred(I, _, "contains"), q_fval(I, 0, _, Lit, _, 0).
+ptext(V, I, K, CAT5("startsWith(", L, ", ", Lit, ")")) :- dia("clickhouse"), plhs(V, I, K, L), q_fpred(I, _, "starts_with"), q_fval(I, 0, _, Lit, _, 0).
+
+// ---- the tree ------------------------------------------------------------------
+.decl tx(v:symbol, id:number, text:symbol)
+.decl tj(v:symbol, id:number, i:number, text:symbol)
+.decl tsep(kind:symbol, s:symbol)
+.decl wtree(v:symbol, text:symbol)
+
+tsep("and", " AND "). tsep("or", " OR ").
+// leaves
+tx(V, I, T) :- tvar(V, _, M, _, _), M != "roll", ptext(V, I, 0, T).
+racc(V, I, 0, T) :- tvar(V, "d", "roll", _, _), ptext(V, I, 0, T).
+racc(V, I, K+1, CAT3(A, " OR ", T)) :- racc(V, I, K, A), ptext(V, I, K+1, T).
+tx(V, I, CAT3("(", A, ")")) :- racc(V, I, K, A), tvar(V, _, "roll", _, N), K+1 = N.
+tx(V, I, T) :- tvar(V, _, "roll", A, _), q_fpred(I, F, _), F != A, ptext(V, I, 0, T).
+tx(V, I, "(1 = 1)") :- tvar(V, "d", _, _, _), fkind(I, "met").
+tx(V, I, "(1 = 1)") :- tvar(V, "h", _, _, _), fkind(I, "dim").
+tx(V, I, "(1 = 1)") :- tvar(V, "d", "true", A, _), q_fpred(I, A, _).
+// connectives
+tj(V, N, 0, T) :- tvar(V, _, _, _, _), q_fnode(N, K, _, _), tsep(K, _), fchild(N, 0, C), tx(V, C, T).
+tj(V, N, I+1, CAT3(A, S, T)) :- tj(V, N, I, A), q_fnode(N, K, _, _), tsep(K, S), fchild(N, I+1, C), tx(V, C, T).
+tx(V, N, CAT3("(", A, ")")) :- tj(V, N, I, A), nchild(N, M), I+1 = M.
+tx(V, N, "(1 = 1)") :- tvar(V, _, _, _, _), q_fnode(N, "and", _, _), nchild(N, 0).
+tx(V, N, "(1 = 0)") :- tvar(V, _, _, _, _), q_fnode(N, "or", _, _), nchild(N, 0).
+tx(V, N, CAT3("(NOT ", T, ")")) :- q_fnode(N, "not", _, _), fchild(N, 0, C), tx(V, C, T).
+// the whole tree, only where it has something to say
+wtree(V, T) :- tvar(V, "d", _, _, _), fnroot(R), fdim(R), tx(V, R, T).
+wtree(V, T) :- tvar(V, "h", _, _, _), fnroot(R), fmet(R), tx(V, R, T).

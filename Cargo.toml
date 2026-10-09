@@ -6,7 +6,8 @@ members = ["crates/*"]
 version = "0.0.0"
 edition = "2024"
 rust-version = "1.85"
-license = "Apache-2.0"
+license-file = "LICENSE"
+publish = false
 repository = "https://github.com/Oberonhive/semantic-gate"
 authors = ["Oberonhive"]
 

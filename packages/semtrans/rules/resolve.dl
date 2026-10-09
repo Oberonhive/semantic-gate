@@ -1,0 +1,217 @@
+// ============================================================================
+// Resolution: which cube answers the query, which members it names, the
+// parameter cascade, and the SQL of every member in play.
+//
+// The cube is the cube of the first metric; every metric and dimension must
+// belong to it. Parameter cascade, most specific first:
+//     params["member.p"]  >  params["p"]  >  the member's declared default
+//         >  the cube's default  >  (evaluation_time, timezone: the context)
+// A value substituted into a fragment must be made of [A-Za-z0-9_./:+-]
+// only: parameters are not a way to write SQL.
+// ============================================================================
+.decl rcube(cube:symbol)
+.decl has_metric(one:number)
+.decl qm(i:number, name:symbol)                 // query metrics, all of the resolved cube
+.decl qd(i:number, name:symbol)                 // query dimensions, all of the resolved cube
+.decl uses_dim(name:symbol)                     // dimensions the plan evaluates; filled by every layer that reads one
+.decl dia(d:symbol)
+
+dia(D) :- q_dialect(D).
+rcube(C) :- q_metric(0, M), c_metric(C, M).
+has_metric(1) :- q_metric(_, _).
+qm(I, N) :- q_metric(I, N), rcube(C), c_metric(C, N).
+qd(I, N) :- q_dim(I, N), rcube(C), c_dimension(C, N).
+uses_dim(N) :- qd(_, N).
+
+// ---- listings for hints ------------------------------------------------------
+.decl cube_(cube:symbol)
+cube_(C) :- c_cube(C, _, _).
+item("metrics", R, N) :- c_metric(_, N), R = count : { c_metric(_, N2), N2 < N }.
+item(cat("metrics:", C), R, N) :- c_metric(C, N), R = count : { c_metric(C, N2), N2 < N }.
+item(cat("dims:", C), R, N) :- c_dimension(C, N), R = count : { c_dimension(C, N2), N2 < N }.
+item("dims", R, N) :- c_dimension(_, N), R = count : { c_dimension(_, N2), N2 < N }.
+.decl modavail(cube:symbol, name:symbol)
+modavail(C, N) :- cube_(C), b_modifier(N, _, _, _).
+modavail(C, N) :- c_modifier(C, N, _, _, _).
+item(cat("mods:", C), R, N) :- modavail(C, N), R = count : { modavail(C, N2), N2 < N }.
+
+// ---- refusals on the shape of the request ------------------------------------
+refusal("invalid_params", "a query needs at least one metric", "name metrics under `metrics`") :- q_dialect(_), !has_metric(1).
+refusal("unknown_metric", CAT3("unknown metric '", N, "'"), cat("known metrics: ", L)) :-
+    q_metric(_, N), !c_metric(_, N), joined("metrics", L).
+refusal("invalid_composition", CAT5("metrics '", M0, "' and '", N, "' belong to different cubes"), cat("metrics of the first one's cube: ", L)) :-
+    rcube(C), q_metric(0, M0), q_metric(_, N), c_metric(C2, N), C2 != C, joined(cat("metrics:", C), L).
+refusal("invalid_params", CAT3("metric '", N, "' is listed twice"), "list each metric once") :- q_metric(I, N), q_metric(J, N), I < J.
+refusal("unknown_dimension", CAT3("unknown dimension '", N, "'"), cat("dimensions of the cube: ", L)) :-
+    q_dim(_, N), !c_dimension(_, N), rcube(C), joined(cat("dims:", C), L).
+refusal("unknown_dimension", CAT3("unknown dimension '", N, "'"), cat("known dimensions: ", L)) :-
+    q_dim(_, N), !c_dimension(_, N), !rcube(_), joined("dims", L).
+refusal("invalid_composition", CAT5("dimension '", N, "' is not defined for cube '", C, "'"), cat("dimensions of this cube: ", L)) :-
+    q_dim(_, N), rcube(C), !c_dimension(C, N), c_dimension(_, N), joined(cat("dims:", C), L).
+refusal("invalid_params", CAT3("dimension '", N, "' is listed twice"), "list each dimension once") :- q_dim(I, N), q_dim(J, N), I < J.
+
+// ---- scopes: where a fragment's holes get their values -----------------------
+// sc(scope, kind, member, cond): kind d | m | c (the cube itself). `cond` is the
+// row condition a class-1 modifier adds to a metric ("" for the plain metric).
+.decl sc(scope:symbol, kind:symbol, member:symbol, cond:symbol)
+.decl mneed(cond:symbol, name:symbol)           // metric evaluations the plan needs
+.decl mdep(name:symbol, dep:symbol)             // derived metric → metric it names (static)
+.decl owner(kind:symbol, member:symbol, key:symbol)
+
+sc("c", "c", "", "").
+sc(cat("d:", D), "d", D, "") :- uses_dim(D), rcube(C), c_dimension(C, D).
+sc(CAT4("m:", N, "|", Cond), "m", N, Cond) :- mneed(Cond, N).
+owner(K, N, CAT3(K, ":", N)) :- sc(_, K, N, _).
+
+// found by text search, not by hole(), so that scanning stays downstream of what is needed
+mdep(N, Dep) :- c_m_derived(C, N, T), c_metric(C, Dep), contains(CAT3("{", Dep, "}"), T).
+mneed("", N) :- qm(_, N).
+mneed(Cond, Dep) :- mneed(Cond, N), mdep(N, Dep).
+
+// ---- the cascade -------------------------------------------------------------
+.decl qpv(key:symbol, value:symbol)             // query parameters that may be substituted
+.decl pwant(scope:symbol, name:symbol)
+.decl pcand(scope:symbol, name:symbol, value:symbol, prio:number)
+.decl pbest(scope:symbol, name:symbol, value:symbol)
+
+qpv(K, V) :- q_param(K, 0, V, _, T, 0), T != "obj", match("[A-Za-z0-9_./:+-]*", V).
+pwant(S, N) :- sc(S, K, M, _), owner(K, M, O), rcube(C), c_pa(C, O, N, _, _).
+pwant(S, N) :- interp_req(S, T), hole(T, _, _, N).
+pwant(S, "time_grain") :- sc(S, "d", D, _), c_d_grain(_, D, _).
+pcand(S, N, V, 40) :- pwant(S, N), sc(S, K, M, _), K != "c", qpv(CAT3(M, ".", N), V).
+pcand(S, N, V, 30) :- pwant(S, N), qpv(N, V).
+pcand(S, N, V, 20) :- pwant(S, N), sc(S, K, M, _), owner(K, M, O), rcube(C), c_pa(C, O, N, "default", V).
+pcand(S, N, V, 10) :- pwant(S, N), rcube(C), c_cparam(C, N, V).
+pcand(S, "evaluation_time", V, 5) :- pwant(S, "evaluation_time"), q_context(V, _).
+pcand(S, "timezone", V, 5) :- pwant(S, "timezone"), q_context(_, V).
+pbest(S, N, V) :- pcand(S, N, V, P), P = max Q : { pcand(S, N, _, Q) }.
+scope_val(S, N, V) :- pbest(S, N, V).
+
+refusal("invalid_params", CAT5("parameter '", N, "' has no value for ", M, ""), CAT3("pass it in `params`, as \"", N, "\" or \"member.param\"")) :-
+    unresolved(S, _, N), sc(S, _, M, _), !c_metric(_, N).
+
+// ---- checks on the parameters a query passes ---------------------------------
+.decl owner_name(owner:symbol, name:symbol)
+.decl pdecl(owner:symbol, param:symbol)
+.decl kmatch(key:symbol, owner:symbol, param:symbol)
+.decl kknown(key:symbol)
+.decl pname(param:symbol)
+.decl ptype(owner:symbol, param:symbol, type:symbol)
+.decl okt(decl:symbol, tag:symbol)
+.decl has_enum(owner:symbol, param:symbol)
+.decl qint(key:symbol, n:number)
+
+okt("integer", "num"). okt("number", "num"). okt("string", "str"). okt("boolean", "bool").
+owner_name(O, N) :- c_pa(_, O, _, _, _), N = substr(O, 2, strlen(O) - 2).
+pdecl(O, P) :- rcube(C), c_pa(C, O, P, _, _), substr(O, 0, 2) != "x:".
+kmatch(K, O, P) :- q_param(K, _, _, _, _, _), pdecl(O, P), K = P.
+kmatch(K, O, P) :- q_param(K, _, _, _, _, _), pdecl(O, P), owner_name(O, N), K = CAT3(N, ".", P).
+kknown(K) :- kmatch(K, _, _).
+kknown(K) :- q_param(K, _, _, _, _, _), rcube(C), c_cparam(C, K, _).
+pname(P) :- pdecl(_, P).
+pname(P) :- rcube(C), c_cparam(C, P, _).
+item("params", R, P) :- pname(P), R = count : { pname(P2), P2 < P }.
+ptype(O, P, T) :- rcube(C), c_pa(C, O, P, "type", T).
+has_enum(O, P) :- rcube(C), c_pa_enum(C, O, P, _, _).
+item(CAT3("enum:", O, cat(":", P)), I, V) :- rcube(C), c_pa_enum(C, O, P, I, V).
+qint(K, to_number(V)) :- q_param(K, 0, V, _, "num", 0), match("-?[0-9]+", V).
+
+refusal("invalid_params", CAT3("param '", K, "' must be a scalar"), "pass a string, a number or a boolean") :- q_param(K, _, _, _, _, 1).
+refusal("invalid_params", CAT3("param '", K, "' must be a scalar"), "pass a string, a number or a boolean") :- q_param(K, _, _, _, "obj", _).
+refusal("invalid_params", CAT3("param '", K, "' holds characters that cannot go into SQL"), "use letters, digits and _ . / : + -") :-
+    q_param(K, 0, V, _, "str", 0), !match("[A-Za-z0-9_./:+-]*", V).
+refusal("invalid_params", CAT3("unknown param '", K, "'"), cat("declared params: ", L)) :- q_param(K, _, _, _, _, _), rcube(_), !kknown(K), joined("params", L).
+refusal("invalid_params", CAT3("unknown param '", K, "'"), "this cube declares no params") :- q_param(K, _, _, _, _, _), rcube(_), !kknown(K), !has_item("params").
+refusal("invalid_params", CAT5("param '", K, "' expects ", T, ""), "") :- kmatch(K, O, P), ptype(O, P, T), q_param(K, 0, _, _, Tag, 0), !okt(T, Tag).
+refusal("invalid_params", CAT3("param '", K, "' expects an integer"), "") :-
+    kmatch(K, O, P), ptype(O, P, "integer"), q_param(K, 0, V, _, "num", 0), !match("-?[0-9]+", V).
+refusal("invalid_params", CAT3("param '", K, "' is not one of the allowed values"), cat("allowed: ", L)) :-
+    kmatch(K, O, P), has_enum(O, P), q_param(K, 0, V, _, _, 0), rcube(C), !c_pa_enum(C, O, P, _, V), joined(CAT3("enum:", O, cat(":", P)), L).
+refusal("invalid_params", CAT3("param '", K, "' is below its minimum"), "") :-
+    kmatch(K, O, P), rcube(C), c_pa(C, O, P, "minimum", M), match("-?[0-9]+", M), qint(K, N), N < to_number(M).
+refusal("invalid_params", CAT3("param '", K, "' is above its maximum"), "") :-
+    kmatch(K, O, P), rcube(C), c_pa(C, O, P, "maximum", M), match("-?[0-9]+", M), qint(K, N), N > to_number(M).
+
+// ---- dimensions: kind, type, grain, SQL ------------------------------------------
+.decl dkind(name:symbol, kind:symbol)
+.decl dvtype(name:symbol, type:symbol)
+.decl dgrain(name:symbol, grain:symbol)
+.decl need_grain(name:symbol)
+.decl dexpr(name:symbol, sql:symbol)
+
+dkind(D, K) :- rcube(C), c_d_info(C, D, "kind", K).
+dkind(D, "time") :- rcube(C), c_dimension(C, D), !c_d_info(C, D, "kind", _), c_d_grain(C, D, _).
+dkind(D, "category") :- rcube(C), c_dimension(C, D), !c_d_info(C, D, "kind", _), !c_d_grain(C, D, _).
+dvtype(D, T) :- rcube(C), c_d_info(C, D, "value_type", T).
+dvtype(D, "date") :- rcube(C), c_dimension(C, D), !c_d_info(C, D, "value_type", _), dkind(D, "time").
+dvtype(D, "string") :- rcube(C), c_dimension(C, D), !c_d_info(C, D, "value_type", _), !dkind(D, "time").
+
+dgrain(D, G) :- sc(S, "d", D, _), pbest(S, "time_grain", G), c_d_grain(_, D, G).
+dgrain(D, G) :- sc(S, "d", D, _), !pbest(S, "time_grain", _), rcube(C), c_d_grain(C, D, G), 1 = count : { c_d_grain(C, D, _) }.
+need_grain(D) :- qd(_, D), dkind(D, "time").
+refusal("invalid_params", CAT3("time dimension '", D, "' has no grain"), "pass `time_grain` in `params`") :- need_grain(D), !dgrain(D, _).
+refusal("invalid_params", CAT5("grain '", G, "' is not offered by '", D, "'"), "") :-
+    sc(S, "d", D, _), pbest(S, "time_grain", G), rcube(C), c_d_grain(C, D, _), !c_d_grain(C, D, G).
+
+interp_req(S, T) :- sc(S, "d", D, _), rcube(C), c_d_sql(C, D, T).
+dexpr(D, E) :- sc(S, "d", D, _), rcube(C), c_d_sql(C, D, T), interp(S, T, E).
+
+// ---- metrics: the aggregate expression of each evaluation ------------------------
+// mexpr(cond, name, sql) is the full aggregate, derived metrics inlined; a metric
+// that is a two-stage aggregate has no inline form (see scopes.dl).
+.decl mexpr(cond:symbol, name:symbol, sql:symbol)
+.decl mfil(cond:symbol, name:symbol, f:symbol)
+.decl mcf(cond:symbol, name:symbol, f:symbol)
+.decl aggx(cond:symbol, name:symbol, agg:symbol, x:symbol)
+
+interp_req(S, T) :- sc(S, "m", N, _), rcube(C), c_m_agg(C, N, _, T), T != "".
+interp_req(S, T) :- sc(S, "m", N, _), rcube(C), c_m_filter(C, N, T).
+interp_req(S, T) :- sc(S, "m", N, _), rcube(C), c_m_sql(C, N, T).
+interp_req(S, T) :- sc(S, "m", N, _), rcube(C), c_m_derived(C, N, T).
+interp_req(S, T) :- sc(S, "m", N, _), rcube(C), c_m_two(C, N, _, T, _).
+interp_req(S, T) :- sc(S, "m", N, _), rcube(C), c_m_two(C, N, T, _, _).
+interp_req(S, T) :- sc(S, "m", N, _), rcube(C), c_m_two(C, N, _, _, T).
+scope_val(S, Dep, CAT3("(", E, ")")) :- sc(S, "m", N, Cond), mdep(N, Dep), mexpr(Cond, Dep, E).
+
+aggx(Cond, N, A, "") :- mneed(Cond, N), rcube(C), c_m_agg(C, N, A, ""). 
+aggx(Cond, N, A, X) :- sc(S, "m", N, Cond), rcube(C), c_m_agg(C, N, A, T), T != "", interp(S, T, X).
+mfil(Cond, N, "") :- aggx(Cond, N, _, _), rcube(C), !c_m_filter(C, N, _).
+mfil(Cond, N, F) :- sc(S, "m", N, Cond), rcube(C), c_m_filter(C, N, T), interp(S, T, F).
+mcf(Cond, N, "") :- mfil(Cond, N, ""), Cond = "".
+mcf(Cond, N, Cond) :- mfil(Cond, N, ""), Cond != "".
+mcf(Cond, N, F) :- mfil(Cond, N, F), F != "", Cond = "".
+mcf(Cond, N, CAT5("(", F, ") AND (", Cond, ")")) :- mfil(Cond, N, F), F != "", Cond != "".
+
+mexpr(Cond, N, E) :- sc(S, "m", N, Cond), Cond = "", rcube(C), c_m_sql(C, N, T), interp(S, T, E).
+mexpr(Cond, N, CAT3("(", E, ")")) :- sc(S, "m", N, Cond), rcube(C), c_m_derived(C, N, T), interp(S, T, E).
+
+// An aggregate by dialect. DuckDB: fn(x) FILTER (WHERE cf). ClickHouse: fn(x), or the -If combinator.
+.decl simple_agg(agg:symbol)
+.decl dbase(cond:symbol, name:symbol, sql:symbol)
+simple_agg("sum"). simple_agg("min"). simple_agg("max"). simple_agg("avg").
+
+dbase(Cond, N, CAT4(A, "(", X, ")")) :- aggx(Cond, N, A, X), simple_agg(A).
+dbase(Cond, N, "count(*)") :- aggx(Cond, N, "count", "").
+dbase(Cond, N, CAT3("count(", X, ")")) :- aggx(Cond, N, "count", X), X != "".
+dbase(Cond, N, CAT3("count(DISTINCT ", X, ")")) :- aggx(Cond, N, "count_distinct", X).
+mexpr(Cond, N, B) :- dia("duckdb"), dbase(Cond, N, B), mcf(Cond, N, "").
+mexpr(Cond, N, CAT3(B, " FILTER (WHERE ", cat(Cf, ")"))) :- dia("duckdb"), dbase(Cond, N, B), mcf(Cond, N, Cf), Cf != "".
+
+mexpr(Cond, N, CAT4(A, "(", X, ")")) :- dia("clickhouse"), aggx(Cond, N, A, X), simple_agg(A), mcf(Cond, N, "").
+mexpr(Cond, N, "count()") :- dia("clickhouse"), aggx(Cond, N, "count", ""), mcf(Cond, N, "").
+mexpr(Cond, N, CAT3("count(", X, ")")) :- dia("clickhouse"), aggx(Cond, N, "count", X), X != "", mcf(Cond, N, "").
+mexpr(Cond, N, CAT3("uniqExact(", X, ")")) :- dia("clickhouse"), aggx(Cond, N, "count_distinct", X), mcf(Cond, N, "").
+mexpr(Cond, N, CAT6(A, "If(", X, ", ", Cf, ")")) :- dia("clickhouse"), aggx(Cond, N, A, X), simple_agg(A), mcf(Cond, N, Cf), Cf != "".
+mexpr(Cond, N, CAT3("countIf(", Cf, ")")) :- dia("clickhouse"), aggx(Cond, N, "count", ""), mcf(Cond, N, Cf), Cf != "".
+mexpr(Cond, N, CAT5("countIf((", X, ") IS NOT NULL AND ", Cf, ")")) :- dia("clickhouse"), aggx(Cond, N, "count", X), X != "", mcf(Cond, N, Cf), Cf != "".
+mexpr(Cond, N, CAT5("uniqExactIf(", X, ", ", Cf, ")")) :- dia("clickhouse"), aggx(Cond, N, "count_distinct", X), mcf(Cond, N, Cf), Cf != "".
+
+.decl two(metric:symbol, entity:symbol, inner:symbol, outer:symbol)   // two-stage metrics, interpolated; `outer` a complete expression over column v
+// A two-stage metric: outer(inner) per entity, then outer over the entities. `outer` is a
+// function prefix ("avg", "quantileExact(0.5)") applied to the per-entity value, or a template
+// holding {v} for it.
+scope_val(S, "v", "v") :- sc(S, "m", _, _).
+two(N, Ent, Inn, cat(Out, "(v)")) :- sc(S, "m", N, ""), rcube(C), c_m_two(C, N, E, I, O),
+    interp(S, E, Ent), interp(S, I, Inn), interp(S, O, Out), !contains("{v}", O).
+two(N, Ent, Inn, Out) :- sc(S, "m", N, ""), rcube(C), c_m_two(C, N, E, I, O),
+    interp(S, E, Ent), interp(S, I, Inn), interp(S, O, Out), contains("{v}", O).

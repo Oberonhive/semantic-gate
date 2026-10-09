@@ -1,0 +1,17 @@
+{
+  "name": "@semantic-gate/cli",
+  "version": "0.0.0",
+  "description": "Command line for semantic-gate: metadata, queries, and queries with an inferred ECharts option, as JSON.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "semantic-gate-js": "./src/main.ts"
+  },
+  "dependencies": {
+    "@semantic-gate/client": "0.0.0",
+    "@semantic-gate/contract": "0.0.0",
+    "@semantic-gate/semtrans": "0.0.0",
+    "@semantic-gate/viz": "0.0.0"
+  }
+}

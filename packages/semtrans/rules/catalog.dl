@@ -1,0 +1,61 @@
+// ============================================================================
+// SEAM 2 of 3 — the cubes in. A cube is a set of `c_*` facts: `lower()` emits
+// them from a CubeModel, and a hand-written `.dl` cube states them directly.
+// Nothing else in the rules names a cube, so a cube cannot reach past this
+// file, and the rules cannot know any cube's name.
+//
+// SQL fragments are in the cube's own dialect and may hold `{name}` holes:
+// parameters (the member's own, then the cube's) or, in a derived metric,
+// other metrics of the cube. Text values are plain symbols; numbers in
+// parameter facts are written as text and typed by their `type` key.
+//
+// `owner` of a parameter is "m:<metric>" or "d:<dimension>"; its `key` is one
+// of type | default | minimum | maximum | description | required ("1").
+// `c_pa_enum` carries an enum in declared order.
+// ============================================================================
+.decl c_cube(cube:symbol, table:symbol, alias:symbol)          // fact table (a name or a parenthesised subquery) and its alias
+.decl c_where(cube:symbol, cond:symbol)                        // constant filter, always applied
+.decl c_cparam(cube:symbol, param:symbol, default:symbol)      // cube-level parameter default: last step of the cascade
+
+.decl c_join(cube:symbol, join:symbol, rank:number, kind:symbol, table:symbol, alias:symbol, on:symbol)  // kind: LEFT | INNER; rank orders emission
+.decl c_join_req(cube:symbol, join:symbol, prereq:symbol)      // a join that needs another one first
+
+.decl c_metric(cube:symbol, name:symbol)
+.decl c_m_info(cube:symbol, name:symbol, key:symbol, value:symbol)   // key: description | value_type | additivity
+.decl c_m_agg(cube:symbol, name:symbol, agg:symbol, expr:symbol)    // agg: sum count count_distinct min max avg; expr "" counts rows
+.decl c_m_filter(cube:symbol, name:symbol, cond:symbol)             // rows an `agg` metric considers
+.decl c_m_sql(cube:symbol, name:symbol, sql:symbol)                 // any aggregate expression, in the dialect
+.decl c_m_derived(cube:symbol, name:symbol, expr:symbol)            // over other metrics: "{revenue} / nullif({orders}, 0)"
+.decl c_m_two(cube:symbol, name:symbol, entity:symbol, inner:symbol, outer:symbol)  // outer(inner) per entity, then over entities
+.decl c_m_join(cube:symbol, name:symbol, join:symbol)               // joins every evaluation needs
+
+.decl c_dimension(cube:symbol, name:symbol)
+.decl c_d_info(cube:symbol, name:symbol, key:symbol, value:symbol)  // key: description | kind | value_type
+.decl c_d_sql(cube:symbol, name:symbol, sql:symbol)
+.decl c_d_grain(cube:symbol, name:symbol, grain:symbol)             // time dimensions: grains it can be presented at
+.decl c_d_join(cube:symbol, name:symbol, join:symbol)
+
+.decl c_pa(cube:symbol, owner:symbol, param:symbol, key:symbol, value:symbol)
+.decl c_pa_enum(cube:symbol, owner:symbol, param:symbol, idx:number, value:symbol)
+.decl c_display(cube:symbol, owner:symbol, json:symbol)             // opaque display hints, a JSON text
+
+// A cube's own modifier: the declaration is data, its behaviour is rules in
+// the cube's `.dl` file that fill the hooks of modifiers.dl. Its parameters
+// are `c_pa` with owner "x:<modifier>".
+.decl c_modifier(cube:symbol, name:symbol, class:number, out:symbol, description:symbol)
+.decl c_mod_req(cube:symbol, name:symbol, additivity:symbol)        // additivities it may apply to; none = all
+
+// ---- load-time checks: a non-empty load_error stops the load -----------------
+.decl load_error(message:symbol)
+.output load_error
+
+load_error(cat("duplicate metric name: ", N)) :- c_metric(C1, N), c_metric(C2, N), C1 < C2.
+load_error(cat("metric without a definition: ", N)) :-
+    c_metric(C, N), !c_m_agg(C, N, _, _), !c_m_sql(C, N, _), !c_m_derived(C, N, _), !c_m_two(C, N, _, _, _).
+load_error(cat("metric without additivity: ", N)) :- c_metric(C, N), !c_m_info(C, N, "additivity", _).
+load_error(cat("dimension without sql: ", N)) :- c_dimension(C, N), !c_d_sql(C, N, _).
+load_error(cat("cube without a table: ", C)) :- c_metric(C, _), !c_cube(C, _, _).
+load_error(cat("cube without a table: ", C)) :- c_dimension(C, _), !c_cube(C, _, _).
+load_error(cat("reserved modifier name: ", N)) :- c_modifier(_, N, _, _, _), b_modifier(N, _, _, _).
+load_error(cat("duplicate modifier name: ", N)) :- c_modifier(C1, N, _, _, _), c_modifier(C2, N, _, _, _), C1 < C2.
+load_error(cat("cube modifier class must be 1: ", N)) :- c_modifier(_, N, K, _, _), K != 1.

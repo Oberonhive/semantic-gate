@@ -1,0 +1,11 @@
+# The shop cube set, authored as free-form Python (a hand-written provider).
+# Python is process-only: the native gate spawns the entrypoint (uv installs
+# the SDK from this repository on first run); local hosts cannot run it.
+# `tables:` is informational here: the gate executes on its configured datasource.
+# Declares no modifiers (a partial vocabulary is legal): modifier-free shop
+# queries return the same rows as ../yaml.
+contract: "0.1"
+entrypoint: [uv, run, --no-project, --with, ../../../python/semantic-gate-provider, python, shop_cube.py]
+tables:
+  orders: ../data/orders.csv
+  customers: ../data/customers.csv

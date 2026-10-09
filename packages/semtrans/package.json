@@ -1,0 +1,15 @@
+{
+  "name": "@semantic-gate/semtrans",
+  "version": "0.0.0",
+  "description": "semtrans: a semantic layer in Datalog — YAML, Datalog, MetricFlow and cube.dev cubes compiled to SQL in any host.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "files": ["src", "rules"],
+  "dependencies": {
+    "@semantic-gate/contract": "0.0.0",
+    "@semantic-gate/datalog": "0.0.0",
+    "yaml": "^2.9.1"
+  }
+}
