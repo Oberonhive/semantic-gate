@@ -1,0 +1,12 @@
+[project]
+name = "semantic-gate-provider"
+version = "0.0.0"
+description = "Write a semantic-gate cube provider in Python; the gate hosts it over stdio JSON-RPC."
+license = "LicenseRef-Proprietary"
+classifiers = ["Private :: Do Not Upload"]
+requires-python = ">=3.11"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

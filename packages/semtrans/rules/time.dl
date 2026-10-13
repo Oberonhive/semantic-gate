@@ -1,0 +1,29 @@
+// ============================================================================
+// Time, in the two dialects: moving a date later by n grains, and numbering
+// buckets so windows are integer ranges. A bucket's number is the count of
+// grains since 1970-01-01; it is exact for values already truncated to the
+// grain, which every presented time dimension is.
+// ============================================================================
+#define IDX_DUCKDB(g,x) CAT5("date_diff('", g, "', DATE '1970-01-01', ", x, ")")
+#define IDX_CLICKHOUSE(g,x) CAT5("dateDiff('", g, "', toDate('1970-01-01'), ", x, ")")
+
+.decl iunit(grain:symbol, n:number, unit:symbol)     // DuckDB INTERVAL body
+.decl addfn(grain:symbol, fn:symbol)                 // ClickHouse
+iunit("day", N, CAT3(to_string(N), " ", "DAY")) :- dshift_req(_, N).
+iunit("week", N, CAT3(to_string(N), " ", "WEEK")) :- dshift_req(_, N).
+iunit("month", N, CAT3(to_string(N), " ", "MONTH")) :- dshift_req(_, N).
+iunit("quarter", N, CAT3(to_string(N * 3), " ", "MONTH")) :- dshift_req(_, N).
+iunit("year", N, CAT3(to_string(N), " ", "YEAR")) :- dshift_req(_, N).
+addfn("day", "addDays"). addfn("week", "addWeeks"). addfn("month", "addMonths").
+addfn("quarter", "addQuarters"). addfn("year", "addYears").
+
+uses_dim(A) :- dshift_req(A, _).
+need_grain(A) :- dshift_req(A, _).
+
+dshift(D, 0, E) :- dshift_req(D, 0), dexpr(D, E).
+dshift(D, N, CAT5("CAST((", E, " + INTERVAL ", U, ") AS DATE)")) :-
+    dia("duckdb"), dshift_req(D, N), N > 0, dexpr(D, E), dgrain(D, G), iunit(G, N, U), dvtype(D, "date").
+dshift(D, N, CAT5("(", E, " + INTERVAL ", U, ")")) :-
+    dia("duckdb"), dshift_req(D, N), N > 0, dexpr(D, E), dgrain(D, G), iunit(G, N, U), dvtype(D, T), T != "date".
+dshift(D, N, CAT6(F, "(", E, ", ", to_string(N), ")")) :-
+    dia("clickhouse"), dshift_req(D, N), N > 0, dexpr(D, E), dgrain(D, G), addfn(G, F).

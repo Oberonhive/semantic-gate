@@ -1,0 +1,423 @@
+{
+  "semantic_models": [
+    {
+      "name": "shop",
+      "description": "Orders of a synthetic online shop, 2024–2025.",
+      "node_relation": {
+        "alias": "orders",
+        "schema_name": "main",
+        "database": "shop",
+        "relation_name": "orders"
+      },
+      "primary_entity": null,
+      "defaults": {
+        "agg_time_dimension": "period"
+      },
+      "entities": [
+        {
+          "name": "order",
+          "type": "primary",
+          "expr": "order_id",
+          "description": null,
+          "label": null,
+          "config": {
+            "meta": {}
+          }
+        },
+        {
+          "name": "customer",
+          "type": "foreign",
+          "expr": "customer_id",
+          "description": "One customer.",
+          "label": "Customer",
+          "config": {
+            "meta": {
+              "value_type": "integer"
+            }
+          }
+        }
+      ],
+      "measures": [
+        {
+          "name": "revenue",
+          "agg": "sum",
+          "expr": "revenue",
+          "description": "Gross order revenue.",
+          "create_metric": false,
+          "agg_time_dimension": null,
+          "non_additive_dimension": null,
+          "agg_params": null
+        },
+        {
+          "name": "orders",
+          "agg": "count",
+          "expr": "1",
+          "description": "Number of orders.",
+          "create_metric": false,
+          "agg_time_dimension": null,
+          "non_additive_dimension": null,
+          "agg_params": null
+        },
+        {
+          "name": "units",
+          "agg": "sum",
+          "expr": "quantity",
+          "description": "Units sold.",
+          "create_metric": false,
+          "agg_time_dimension": null,
+          "non_additive_dimension": null,
+          "agg_params": null
+        },
+        {
+          "name": "customers",
+          "agg": "count_distinct",
+          "expr": "customer_id",
+          "description": "Distinct ordering customers.",
+          "create_metric": false,
+          "agg_time_dimension": null,
+          "non_additive_dimension": null,
+          "agg_params": null
+        },
+        {
+          "name": "margin",
+          "agg": "sum",
+          "expr": "revenue - cost",
+          "description": "Revenue minus cost.",
+          "create_metric": false,
+          "agg_time_dimension": null,
+          "non_additive_dimension": null,
+          "agg_params": null
+        },
+        {
+          "name": "returned",
+          "agg": "average",
+          "expr": "returned",
+          "description": "Share of orders returned.",
+          "create_metric": false,
+          "agg_time_dimension": null,
+          "non_additive_dimension": null,
+          "agg_params": null
+        }
+      ],
+      "dimensions": [
+        {
+          "name": "period",
+          "type": "time",
+          "expr": "order_date",
+          "description": "Order date, truncated to the `time_grain` parameter (default month).",
+          "type_params": {
+            "time_granularity": "day",
+            "validity_params": null
+          },
+          "label": "Period",
+          "config": {
+            "meta": {
+              "default_grain": "month"
+            }
+          }
+        },
+        {
+          "name": "region",
+          "type": "categorical",
+          "expr": "region",
+          "description": "Sales region.",
+          "label": "Region",
+          "config": {
+            "meta": {
+              "order": [
+                "EU",
+                "North America",
+                "APAC",
+                "LATAM"
+              ]
+            }
+          }
+        },
+        {
+          "name": "country",
+          "type": "categorical",
+          "expr": "country",
+          "description": "ISO 3166-1 alpha-2 country of the customer.",
+          "label": "Country",
+          "config": {
+            "meta": {
+              "kind": "geo"
+            }
+          }
+        },
+        {
+          "name": "channel",
+          "type": "categorical",
+          "expr": "channel",
+          "description": "Sales channel.",
+          "label": "Channel",
+          "config": {
+            "meta": {
+              "colors": {
+                "web": "#4e79a7",
+                "app": "#f28e2b",
+                "retail": "#59a14f",
+                "partner": "#b07aa1"
+              }
+            }
+          }
+        },
+        {
+          "name": "category",
+          "type": "categorical",
+          "expr": "category",
+          "description": "Product category.",
+          "label": "Category",
+          "config": {
+            "meta": {}
+          }
+        }
+      ]
+    },
+    {
+      "name": "customers",
+      "description": "Customers of the shop; a join target for the orders.",
+      "node_relation": {
+        "alias": "customers",
+        "schema_name": "main",
+        "database": "shop",
+        "relation_name": "customers"
+      },
+      "primary_entity": null,
+      "defaults": {
+        "agg_time_dimension": null
+      },
+      "entities": [
+        {
+          "name": "customer",
+          "type": "primary",
+          "expr": "customer_id",
+          "description": null
+        }
+      ],
+      "measures": [],
+      "dimensions": [
+        {
+          "name": "segment",
+          "type": "categorical",
+          "expr": "segment",
+          "description": "Customer segment.",
+          "label": "Segment",
+          "config": {
+            "meta": {}
+          }
+        }
+      ]
+    }
+  ],
+  "metrics": [
+    {
+      "name": "revenue",
+      "description": "Gross order revenue.",
+      "type": "simple",
+      "type_params": {
+        "measure": {
+          "name": "revenue",
+          "filter": null,
+          "alias": null,
+          "join_to_timespine": false,
+          "fill_nulls_with": null
+        }
+      },
+      "filter": null,
+      "metadata": null,
+      "label": "Revenue",
+      "config": {
+        "meta": {
+          "unit": "USD",
+          "format": "currency",
+          "good_when": "up"
+        }
+      }
+    },
+    {
+      "name": "orders",
+      "description": "Number of orders.",
+      "type": "simple",
+      "type_params": {
+        "measure": {
+          "name": "orders",
+          "filter": null,
+          "alias": null,
+          "join_to_timespine": false,
+          "fill_nulls_with": null
+        }
+      },
+      "filter": null,
+      "metadata": null,
+      "label": "Orders",
+      "config": {
+        "meta": {
+          "format": "number",
+          "decimals": 0,
+          "good_when": "up"
+        }
+      }
+    },
+    {
+      "name": "units",
+      "description": "Units sold.",
+      "type": "simple",
+      "type_params": {
+        "measure": {
+          "name": "units",
+          "filter": null,
+          "alias": null,
+          "join_to_timespine": false,
+          "fill_nulls_with": null
+        }
+      },
+      "filter": null,
+      "metadata": null,
+      "label": "Units",
+      "config": {
+        "meta": {
+          "format": "number",
+          "decimals": 0,
+          "value_type": "integer"
+        }
+      }
+    },
+    {
+      "name": "customers",
+      "description": "Distinct ordering customers.",
+      "type": "simple",
+      "type_params": {
+        "measure": {
+          "name": "customers",
+          "filter": null,
+          "alias": null,
+          "join_to_timespine": false,
+          "fill_nulls_with": null
+        }
+      },
+      "filter": null,
+      "metadata": null,
+      "label": "Customers",
+      "config": {
+        "meta": {
+          "format": "number",
+          "decimals": 0,
+          "good_when": "up"
+        }
+      }
+    },
+    {
+      "name": "margin",
+      "description": "Revenue minus cost.",
+      "type": "simple",
+      "type_params": {
+        "measure": {
+          "name": "margin",
+          "filter": null,
+          "alias": null,
+          "join_to_timespine": false,
+          "fill_nulls_with": null
+        }
+      },
+      "filter": null,
+      "metadata": null,
+      "label": "Margin",
+      "config": {
+        "meta": {
+          "unit": "USD",
+          "format": "currency",
+          "good_when": "up"
+        }
+      }
+    },
+    {
+      "name": "aov",
+      "description": "Average order value.",
+      "type": "ratio",
+      "type_params": {
+        "numerator": {
+          "name": "revenue",
+          "filter": null,
+          "alias": null
+        },
+        "denominator": {
+          "name": "orders",
+          "filter": null,
+          "alias": null
+        }
+      },
+      "filter": null,
+      "metadata": null,
+      "label": "Average order value",
+      "config": {
+        "meta": {
+          "unit": "USD",
+          "format": "currency",
+          "good_when": "up"
+        }
+      }
+    },
+    {
+      "name": "margin_pct",
+      "description": "Margin as a share of revenue.",
+      "type": "ratio",
+      "type_params": {
+        "numerator": {
+          "name": "margin",
+          "filter": null,
+          "alias": null
+        },
+        "denominator": {
+          "name": "revenue",
+          "filter": null,
+          "alias": null
+        }
+      },
+      "filter": null,
+      "metadata": null,
+      "label": "Margin %",
+      "config": {
+        "meta": {
+          "format": "percent",
+          "decimals": 1,
+          "good_when": "up"
+        }
+      }
+    },
+    {
+      "name": "return_rate",
+      "description": "Share of orders returned.",
+      "type": "simple",
+      "type_params": {
+        "measure": {
+          "name": "returned",
+          "filter": null,
+          "alias": null,
+          "join_to_timespine": false,
+          "fill_nulls_with": null
+        }
+      },
+      "filter": null,
+      "metadata": null,
+      "label": "Return rate",
+      "config": {
+        "meta": {
+          "format": "percent",
+          "decimals": 1,
+          "good_when": "down"
+        }
+      }
+    }
+  ],
+  "project_configuration": {
+    "time_spine_table_configurations": [],
+    "metadata": null,
+    "dsi_package_version": {
+      "major_version": "0",
+      "minor_version": "7",
+      "patch_version": "1"
+    }
+  },
+  "saved_queries": []
+}

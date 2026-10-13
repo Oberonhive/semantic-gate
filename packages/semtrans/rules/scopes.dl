@@ -1,0 +1,96 @@
+// ============================================================================
+// Aggregate scopes. Every place the plan aggregates the fact table — the base
+// result, a modifier's neighbour window, a ranking — is a *scope*: dimensions,
+// metrics, a WHERE and maybe a HAVING over the one FROM the query needs. A layer
+// declares a scope with
+//     scope(sid, seq)                   becomes the node `sid` (and helpers around it)
+//     sdim(sid, i, sql)                 column d<i>, grouped by
+//     smet(sid, alias, sql)             an aggregate column
+//     stwo(sid, alias, entity, inner, outer)   an aggregate of a per-entity aggregate
+//     swhere(sid, ord, cond), shaving(sid, ord, cond), sextra(sid, ord, join_text)
+//     sm(sid, alias, metric)            the plain metric, however it is evaluated (becomes smet or stwo)
+// and this file turns it into nodes. Scope seqs are at least 10 apart.
+// ============================================================================
+.decl scope(sid:symbol, seq:number)
+.decl sdim(sid:symbol, i:number, sql:symbol)
+.decl smet(sid:symbol, alias:symbol, sql:symbol)
+.decl stwo(sid:symbol, alias:symbol, entity:symbol, inner:symbol, outer:symbol)
+.decl swhere(sid:symbol, at:number, cond:symbol)
+.decl shaving(sid:symbol, at:number, cond:symbol)
+.decl sextra(sid:symbol, at:number, text:symbol)
+.decl sm(sid:symbol, alias:symbol, metric:symbol)
+smet(S, A, E) :- sm(S, A, N), mexpr("", N, E).
+stwo(S, A, Ent, Inn, Out) :- sm(S, A, N), two(N, Ent, Inn, Out).
+
+// ---- the one FROM every scope shares: the fact table and the joins its members need ---
+.decl jneed(join:symbol)
+.decl srcfrom(text:symbol)
+.decl srcwhere(at:number, cond:symbol)
+.decl srcjoin(at:number, text:symbol, on:symbol)
+
+jneed(J) :- uses_dim(D), rcube(C), c_d_join(C, D, J).
+jneed(J) :- mneed(_, N), rcube(C), c_m_join(C, N, J).
+jneed(J2) :- jneed(J), rcube(C), c_join_req(C, J, J2).
+
+interp_req("c", T) :- rcube(C), c_cube(C, T, _).
+interp_req("c", W) :- rcube(C), c_where(C, W).
+interp_req("c", T) :- jneed(J), rcube(C), c_join(C, J, _, _, T, _, _).
+interp_req("c", On) :- jneed(J), rcube(C), c_join(C, J, _, _, _, _, On).
+srcfrom(CAT3(T1, " AS ", A)) :- rcube(C), c_cube(C, T, A), interp("c", T, T1).
+srcwhere(1000 + R, CAT3("(", W1, ")")) :- rcube(C), c_where(C, W), R = count : { c_where(C, W2), W2 < W }, interp("c", W, W1).
+srcjoin(R, CAT5(K, " JOIN ", T1, " AS ", A), On1) :-
+    jneed(J), rcube(C), c_join(C, J, R, K, T, A, On), interp("c", T, T1), interp("c", On, On1).
+
+// ---- scope → nodes -------------------------------------------------------------------
+.decl has_two(sid:symbol)
+.decl gnode(sid:symbol, node:symbol)
+.decl sjoin(sid:symbol, node:symbol)              // helper nodes of a scope with two-stage metrics
+.decl snodes(node:symbol, sid:symbol)             // every node that reads the shared FROM
+
+has_two(S) :- stwo(S, _, _, _, _).
+gnode(S, S) :- scope(S, _), !has_two(S).
+gnode(S, cat(S, "_g")) :- scope(S, _), has_two(S).
+node(G, Q) :- gnode(S, G), scope(S, Q).
+
+ncol(G, I, cat("d", to_string(I)), E) :- gnode(S, G), sdim(S, I, E).
+ncol(G, 1000 + R, A, E) :- gnode(S, G), smet(S, A, E), R = count : { smet(S, A2, _), A2 < A }.
+ncol(G, 9000, "one", "1") :- gnode(S, G), has_two(S).
+ngroup(G, I, E) :- gnode(S, G), sdim(S, I, E).
+nwhere(G, O, C) :- gnode(S, G), swhere(S, O, C).
+nwhere(G, O, C) :- gnode(S, G), srcwhere(O, C).
+nhaving(G, O, C) :- gnode(S, G), shaving(S, O, C).
+njoin(G, O, T) :- gnode(S, G), sextra(S, O, T).
+
+snodes(G, S) :- gnode(S, G).
+// the entity-level and the outer stage of each two-stage metric
+snodes(CAT3(S, "_e_", A), S) :- stwo(S, A, _, _, _).
+node(CAT3(S, "_e_", A), Q + 1) :- stwo(S, A, _, _, _), scope(S, Q).
+node(CAT3(S, "_t_", A), Q + 2) :- stwo(S, A, _, _, _), scope(S, Q).
+ncol(CAT3(S, "_e_", A), I, cat("d", to_string(I)), E) :- stwo(S, A, _, _, _), sdim(S, I, E).
+ncol(CAT3(S, "_e_", A), 5000, "e", Ent) :- stwo(S, A, Ent, _, _).
+ncol(CAT3(S, "_e_", A), 5001, "v", Inn) :- stwo(S, A, _, Inn, _).
+ngroup(CAT3(S, "_e_", A), I, E) :- stwo(S, A, _, _, _), sdim(S, I, E).
+ngroup(CAT3(S, "_e_", A), 5000, Ent) :- stwo(S, A, Ent, _, _).
+nwhere(CAT3(S, "_e_", A), O, C) :- stwo(S, A, _, _, _), swhere(S, O, C).
+nwhere(CAT3(S, "_e_", A), O, C) :- stwo(S, A, _, _, _), srcwhere(O, C).
+njoin(CAT3(S, "_e_", A), O, T) :- stwo(S, A, _, _, _), sextra(S, O, T).
+nfrom(CAT3(S, "_t_", A), CAT3(S, "_e_", A)) :- stwo(S, A, _, _, _).
+ncol(CAT3(S, "_t_", A), I, cat("d", to_string(I)), cat("d", to_string(I))) :- stwo(S, A, _, _, _), sdim(S, I, _).
+ngroup(CAT3(S, "_t_", A), I, cat("d", to_string(I))) :- stwo(S, A, _, _, _), sdim(S, I, _).
+ncol(CAT3(S, "_t_", A), 5000, "v", Out) :- stwo(S, A, _, _, Out).
+nfrom(CAT3(S, "_e_", A), F) :- stwo(S, A, _, _, _), srcfrom(F).
+
+nfrom(G, F) :- gnode(S, G), srcfrom(F).
+njoin(N, R, T) :- snodes(N, _), srcjoin(R, T, _).
+njoin_on(N, R, 0, On) :- snodes(N, _), srcjoin(R, _, On).
+
+// the scope's own node, joined from the grouped node and its two-stage helpers
+node(S, Q + 3) :- has_two(S), scope(S, Q).
+nfrom(S, cat(G, " AS g")) :- has_two(S), gnode(S, G).
+ncol(S, I, cat("d", to_string(I)), cat("g.d", to_string(I))) :- has_two(S), sdim(S, I, _).
+ncol(S, 1000 + R, A, cat("g.", A)) :- has_two(S), smet(S, A, _), R = count : { smet(S, A2, _), A2 < A }.
+ncol(S, 2000 + R, A, CAT3("t_", A, ".v")) :- stwo(S, A, _, _, _), R = count : { stwo(S, A2, _, _, _), A2 < A }.
+njoin(S, 100 + R, CAT5("LEFT JOIN ", S, "_t_", A, cat(" AS t_", A))) :- stwo(S, A, _, _, _), R = count : { stwo(S, A2, _, _, _), A2 < A }.
+njoin_on(S, 100 + R, I, CAT5("g.d", to_string(I), " IS NOT DISTINCT FROM t_", A, cat(".d", to_string(I)))) :-
+    stwo(S, A, _, _, _), sdim(S, I, _), R = count : { stwo(S, A2, _, _, _), A2 < A }.
+njoin_on(S, 100 + R, 0, "1 = 1") :- stwo(S, A, _, _, _), !sdim(S, _, _), R = count : { stwo(S, A2, _, _, _), A2 < A }.

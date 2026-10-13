@@ -1,0 +1,88 @@
+cube: shop
+description: Orders of a synthetic online shop, 2024–2025.
+table: orders
+alias: o
+joins:
+  customers: {table: customers, alias: c, on: o.customer_id = c.customer_id}
+
+metrics:
+  revenue:
+    agg: sum
+    expr: o.revenue
+    description: Gross order revenue.
+    display: {label: Revenue, unit: USD, format: currency, good_when: up}
+  orders:
+    agg: count
+    description: Number of orders.
+    value_type: integer
+    display: {label: Orders, format: number, decimals: 0, good_when: up}
+  units:
+    agg: sum
+    expr: o.quantity
+    description: Units sold.
+    value_type: integer
+    display: {label: Units, format: number, decimals: 0}
+  customers:
+    agg: count_distinct
+    expr: o.customer_id
+    additivity: non_reaggregable
+    description: Distinct ordering customers.
+    value_type: integer
+    display: {label: Customers, format: number, decimals: 0, good_when: up}
+  margin:
+    sql: sum(o.revenue - o.cost)
+    additivity: additive
+    description: Revenue minus cost.
+    display: {label: Margin, unit: USD, format: currency, good_when: up}
+  aov:
+    derived: "{revenue} / nullif({orders}, 0)"
+    description: Average order value.
+    display: {label: Average order value, unit: USD, format: currency, good_when: up}
+  margin_pct:
+    derived: "{margin} / nullif({revenue}, 0)"
+    description: Margin as a share of revenue.
+    display: {label: Margin %, format: percent, decimals: 1, good_when: up}
+  return_rate:
+    agg: avg
+    expr: o.returned
+    additivity: non_reaggregable
+    description: Share of orders returned.
+    display: {label: Return rate, format: percent, decimals: 1, good_when: down}
+
+dimensions:
+  period:
+    sql: "date_trunc('{time_grain}', o.order_date)"
+    kind: time
+    grains: [day, week, month, quarter, year]
+    description: Order date, truncated to the `time_grain` parameter (default month).
+    params:
+      time_grain: {type: string, enum: [day, week, month, quarter, year], default: month}
+    display: {label: Period}
+  region:
+    sql: o.region
+    description: Sales region.
+    display: {label: Region, order: [EU, North America, APAC, LATAM]}
+  country:
+    sql: o.country
+    kind: geo
+    description: ISO 3166-1 alpha-2 country of the customer.
+    display: {label: Country}
+  channel:
+    sql: o.channel
+    description: Sales channel.
+    display: {label: Channel, colors: {web: "#4e79a7", app: "#f28e2b", retail: "#59a14f", partner: "#b07aa1"}}
+  category:
+    sql: o.category
+    description: Product category.
+    display: {label: Category}
+  segment:
+    sql: c.segment
+    joins: [customers]
+    description: Customer segment.
+    display: {label: Segment}
+  customer:
+    sql: o.customer_id
+    kind: entity
+    value_type: integer
+    description: One customer.
+    display: {label: Customer}

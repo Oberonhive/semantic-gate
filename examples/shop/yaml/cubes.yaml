@@ -1,0 +1,7 @@
+# The shop cube set, authored as YAML (CubeModel). Every sibling directory
+# authors the same cube another way; the same queries must give the same rows.
+contract: "0.1"
+semtrans: [shop.yaml]
+tables:
+  orders: ../data/orders.csv
+  customers: ../data/customers.csv

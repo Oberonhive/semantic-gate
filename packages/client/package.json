@@ -1,0 +1,19 @@
+{
+  "name": "@semantic-gate/client",
+  "version": "0.0.0",
+  "description": "Query a semantic-gate namespace from the browser or node, over REST or fully local; get rows and an inferred ECharts option.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./node": "./src/node.ts",
+    "./browser": "./src/browser.ts"
+  },
+  "dependencies": {
+    "@semantic-gate/contract": "0.0.0",
+    "@semantic-gate/semtrans": "0.0.0",
+    "@semantic-gate/viz": "0.0.0",
+    "yaml": "^2.9.1"
+  }
+}

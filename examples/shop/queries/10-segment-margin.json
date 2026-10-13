@@ -1,0 +1,2 @@
+{"metrics": ["margin_pct", "return_rate"], "dimensions": ["segment", "category"],
+ "order": [{"field": "margin_pct", "dir": "desc"}]}

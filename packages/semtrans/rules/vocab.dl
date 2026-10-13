@@ -1,0 +1,105 @@
+// ============================================================================
+// The modifier vocabulary: what a modifier is called, its class, what it does
+// to its metric's values (`output`), the parameters it takes and which metric
+// additivities it may apply to. Base modifiers are declared here; a cube
+// declares its own with `c_modifier`. Both appear in metadata through the
+// `x_*` relations, base first. Behaviour is in modifiers.dl.
+//
+// Every column-producing modifier also takes `metrics` (array of metric
+// names), default every query metric. Parameters follow the MOD-001 JSON Schema
+// subset; `required` is "1"; a missing `default` means "no default".
+// ============================================================================
+.decl b_modifier(name:symbol, class:number, out:symbol, description:symbol)
+.decl b_pa(mod:symbol, param:symbol, key:symbol, value:symbol)
+.decl b_pa_enum(mod:symbol, param:symbol, idx:number, value:symbol)
+.decl b_req(mod:symbol, additivity:symbol)
+.decl all_additivity(a:symbol)
+all_additivity("additive"). all_additivity("semi_additive"). all_additivity("mergeable"). all_additivity("non_reaggregable").
+
+b_modifier("prev_value", 2, "level", "The metric over the previous window of the date axis `along`.").
+b_modifier("delta_abs", 2, "difference", "Current window minus previous window of the metric.").
+b_modifier("delta_pct", 2, "ratio", "Relative change of the current window against the previous one; null when the previous is absent or zero.").
+b_modifier("topn", 3, "rows", "Keep the n members of a dimension with the highest `by` metric; the rest dropped or collapsed into `__rest__`.").
+b_modifier("rank", 3, "rank", "Position of each row by a metric; ties go to the dimension tuple, ascending.").
+b_modifier("share", 3, "share", "The metric as a fraction of its total, within the listed dimensions or over the whole result.").
+b_modifier("cumulative", 3, "level", "Running total of the metric along a date axis in the query.").
+b_modifier("rolling", 4, "level", "Moving average (or sum) of the metric over the last n buckets of a date axis in the query.").
+
+// class 2 shares one parameter set
+.decl b_family(mod:symbol, family:symbol)
+.decl b_fam_pa(family:symbol, param:symbol, key:symbol, value:symbol)
+b_family("prev_value", "c2"). b_family("delta_abs", "c2"). b_family("delta_pct", "c2").
+b_pa(M, P, K, V) :- b_family(M, F), b_fam_pa(F, P, K, V).
+b_fam_pa("c2", "along", "type", "string"). b_fam_pa("c2", "along", "required", "1").
+b_fam_pa("c2", "along", "description", "Date dimension the windows are laid on.").
+b_fam_pa("c2", "anchor", "type", "string").
+b_fam_pa("c2", "anchor", "description", "Last date of the current window; default the latest `along` value in the data.").
+b_fam_pa("c2", "range", "type", "integer"). b_fam_pa("c2", "range", "minimum", "1"). b_fam_pa("c2", "range", "default", "1").
+b_fam_pa("c2", "range", "description", "Current window length, in grains of `along`.").
+b_fam_pa("c2", "shift", "type", "integer"). b_fam_pa("c2", "shift", "minimum", "1").
+b_fam_pa("c2", "shift", "description", "Distance from the current window to the previous one; default `range`.").
+b_fam_pa("c2", "metrics", "type", "array"). b_fam_pa("c2", "metrics", "items", "string").
+
+b_pa("topn", "by", "type", "string"). b_pa("topn", "by", "required", "1").
+b_pa("topn", "by", "description", "Metric ranking the members.").
+b_pa("topn", "n", "type", "integer"). b_pa("topn", "n", "required", "1"). b_pa("topn", "n", "minimum", "1").
+b_pa("topn", "universe", "type", "string"). b_pa("topn", "universe", "default", "post_filter").
+b_pa_enum("topn", "universe", 0, "post_filter").
+b_pa("topn", "rest", "type", "string"). b_pa("topn", "rest", "default", "drop").
+b_pa_enum("topn", "rest", 0, "drop"). b_pa_enum("topn", "rest", 1, "collapse").
+b_pa("topn", "dimension", "type", "string").
+b_pa("topn", "dimension", "description", "Dimension to rank; default the only non-time dimension of the query.").
+
+b_pa("rank", "by", "type", "string"). b_pa("rank", "by", "required", "1").
+b_pa("rank", "dir", "type", "string"). b_pa("rank", "dir", "default", "desc").
+b_pa_enum("rank", "dir", 0, "asc"). b_pa_enum("rank", "dir", 1, "desc").
+b_pa("rank", "metrics", "type", "array"). b_pa("rank", "metrics", "items", "string").
+
+b_pa("share", "within", "type", "array"). b_pa("share", "within", "items", "string").
+b_pa("share", "within", "description", "Dimensions that bound each total; default the whole result.").
+b_pa("share", "metrics", "type", "array"). b_pa("share", "metrics", "items", "string").
+
+b_pa("cumulative", "along", "type", "string"). b_pa("cumulative", "along", "required", "1").
+b_pa("cumulative", "metrics", "type", "array"). b_pa("cumulative", "metrics", "items", "string").
+
+b_pa("rolling", "along", "type", "string"). b_pa("rolling", "along", "required", "1").
+b_pa("rolling", "n", "type", "integer"). b_pa("rolling", "n", "required", "1"). b_pa("rolling", "n", "minimum", "2").
+b_pa("rolling", "agg", "type", "string"). b_pa("rolling", "agg", "default", "avg").
+b_pa_enum("rolling", "agg", 0, "avg"). b_pa_enum("rolling", "agg", 1, "sum").
+b_pa("rolling", "metrics", "type", "array"). b_pa("rolling", "metrics", "items", "string").
+
+b_req("share", "additive").
+b_req("cumulative", "additive").
+b_req(M, A) :- b_modifier(M, _, _, _), M != "share", M != "cumulative", all_additivity(A).
+
+// ---- the vocabulary as metadata publishes it: base first, then the cubes' ---
+.decl x_mod(name:symbol, class:number, out:symbol, description:symbol, origin:symbol)
+.decl x_pa(mod:symbol, param:symbol, key:symbol, value:symbol)
+.decl x_pa_enum(mod:symbol, param:symbol, idx:number, value:symbol)
+.decl x_req(mod:symbol, additivity:symbol)
+
+x_mod(N, K, O, D, "base") :- b_modifier(N, K, O, D).
+x_mod(N, K, O, D, "cube") :- c_modifier(_, N, K, O, D).
+x_pa(M, P, K, V) :- b_pa(M, P, K, V).
+x_pa(M, P, K, V) :- c_pa(_, O, P, K, V), O = cat("x:", M), c_modifier(_, M, _, _, _).
+x_pa_enum(M, P, I, V) :- b_pa_enum(M, P, I, V).
+x_pa_enum(M, P, I, V) :- c_pa_enum(_, O, P, I, V), O = cat("x:", M), c_modifier(_, M, _, _, _).
+x_pa(M, "metrics", "type", "array") :- c_modifier(_, M, _, _, _).
+x_pa(M, "metrics", "items", "string") :- c_modifier(_, M, _, _, _).
+x_req(M, A) :- b_req(M, A).
+x_req(M, A) :- c_mod_req(_, M, A).
+// a cube modifier that names no additivity applies to every one
+x_req(M, A) :- c_modifier(_, M, _, _, _), !c_mod_req(_, M, _), all_additivity(A).
+
+.output x_mod
+.output x_pa
+.output x_pa_enum
+.output x_req
+.output c_metric
+.output c_m_info
+.output c_dimension
+.output c_d_info
+.output c_d_grain
+.output c_pa
+.output c_pa_enum
+.output c_display

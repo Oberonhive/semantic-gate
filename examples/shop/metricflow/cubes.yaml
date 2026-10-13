@@ -1,0 +1,7 @@
+# The shop cube set, imported from a dbt MetricFlow semantic manifest
+# (target/semantic_manifest.json, here hand-written as `dbt parse` would emit it).
+contract: "0.1"
+semtrans: [{metricflow: semantic_manifest.json}]
+tables:
+  orders: ../data/orders.csv
+  customers: ../data/customers.csv

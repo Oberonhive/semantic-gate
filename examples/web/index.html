@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>semantic-gate</title>
+<style>
+  :root { --bg:#fafaf8; --fg:#23272e; --muted:#6c727c; --line:#dcdcd6; --card:#fff; --accent:#3d5afe; --bad:#c0392b; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#17191d; --fg:#e6e7ea; --muted:#9097a1; --line:#2d3138; --card:#1f2227; --accent:#8ea0ff; --bad:#ff7a6b; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.45 system-ui, sans-serif; }
+  header { padding:14px 20px; border-bottom:1px solid var(--line); display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+  h1 { font-size:16px; margin:0; font-weight:600; }
+  main { display:grid; grid-template-columns:280px 1fr; gap:20px; padding:20px; max-width:1200px; margin:0 auto; }
+  @media (max-width:760px) { main { grid-template-columns:1fr; } }
+  fieldset { border:1px solid var(--line); border-radius:6px; padding:8px 12px; margin:0 0 12px; background:var(--card); }
+  legend { color:var(--muted); font-size:12px; padding:0 4px; }
+  input[type=text], input[type=password], textarea { width:100%; font:inherit; background:var(--bg); color:var(--fg); border:1px solid var(--line); border-radius:4px; padding:4px 6px; }
+  textarea { font:12px/1.4 ui-monospace, monospace; height:150px; resize:vertical; }
+  label { display:block; margin:4px 0; }
+  #queries button { display:block; width:100%; text-align:left; margin:2px 0; padding:5px 8px; font:inherit; color:var(--fg); background:var(--card); border:1px solid var(--line); border-radius:4px; cursor:pointer; }
+  #queries button:hover, #queries button.on { border-color:var(--accent); }
+  #chart { height:420px; background:var(--card); border:1px solid var(--line); border-radius:6px; }
+  #status { color:var(--muted); margin:8px 0; min-height:1.4em; }
+  #status.err { color:var(--bad); }
+  #table { overflow:auto; max-height:420px; background:var(--card); border:1px solid var(--line); border-radius:6px; }
+  table { border-collapse:collapse; width:100%; } th, td { padding:4px 10px; border-bottom:1px solid var(--line); text-align:right; white-space:nowrap; }
+  th:first-child, td:first-child { text-align:left; } th { position:sticky; top:0; background:var(--card); }
+  #reasons { margin:12px 0 0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:6px; }
+  #reasons li { font:12px ui-monospace, monospace; border:1px solid var(--line); border-radius:10px; padding:1px 8px; background:var(--card); }
+  #reasons li span { color:var(--muted); }
+  button.run { margin-top:6px; padding:5px 14px; font:inherit; background:var(--accent); color:#fff; border:0; border-radius:4px; cursor:pointer; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>semantic-gate</h1>
+  <label><input type="radio" name="mode" value="local" checked> Local: provider and DuckDB in this page</label>
+  <label><input type="radio" name="mode" value="remote" id="remote-mode"> Remote: a gate over REST</label>
+</header>
+<main>
+  <aside>
+    <fieldset id="local"><legend>Cube directory</legend><input type="text" id="cubes" value="/examples/shop/yaml"></fieldset>
+    <fieldset id="remote" hidden><legend>Gate</legend>
+      <label>URL <input type="text" id="gate" value="http://127.0.0.1:7792"></label>
+      <label>Namespace <input type="text" id="ns" value="shop-yaml"></label>
+      <label>Token <input type="password" id="token"></label>
+    </fieldset>
+    <fieldset id="queries"><legend>Example queries</legend></fieldset>
+  </aside>
+  <section>
+    <textarea id="query" spellcheck="false" aria-label="Query JSON"></textarea>
+    <button class="run" id="run">Run</button>
+    <div id="status"></div>
+    <div id="chart"></div>
+    <div id="table" hidden></div>
+    <ul id="reasons"></ul>
+  </section>
+</main>
+<script type="module" src="/examples/web/dist/main.js"></script>
+</body>
+</html>

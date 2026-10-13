@@ -1,0 +1,2 @@
+{"metrics": ["revenue"], "dimensions": ["period", "channel"], "params": {"time_grain": "quarter"},
+ "viz": {"chart": "area", "stack": "percent", "title": "Channel mix"}}

@@ -1,0 +1,11 @@
+# Build outputs: `cargo build`, `npm ci`, the web example's bundle.
+/target/
+node_modules/
+__pycache__/
+/examples/web/dist/
+
+# Never in git. The gate resolves secret references; it does not store secrets.
+*.pem
+*.key
+.env
+.env.*

@@ -1,0 +1,9 @@
+{
+  "name": "@semantic-gate/datalog",
+  "version": "0.0.0",
+  "description": "A Soufflé-subset Datalog engine in TypeScript: runs the same rules in the browser, node, and behind a native gate.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" }
+}

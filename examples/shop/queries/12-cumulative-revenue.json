@@ -1,0 +1,4 @@
+{"metrics": ["revenue"], "dimensions": ["period"],
+ "filters": {"field": "period", "op": ">=", "value": "2025-01-01"},
+ "modifiers": [{"name": "cumulative", "params": {"along": "period"}}],
+ "viz": {"y": ["cumulative(revenue)"]}}

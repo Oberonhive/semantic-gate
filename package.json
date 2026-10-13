@@ -1,0 +1,21 @@
+{
+  "name": "semantic-gate-js",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "JS side of semantic-gate: contract mirror, provider SDK, chart inference, client, CLI. See docs/architecture.md.",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "check": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@duckdb/duckdb-wasm": "^1.32.0",
+    "@duckdb/node-api": "^1.5.5-r.5",
+    "@types/node": "^22.0.0",
+    "echarts": "^5.6.0",
+    "esbuild": "^0.25.12",
+    "typescript": "^5.6.0",
+    "yaml": "^2.9.1"
+  }
+}

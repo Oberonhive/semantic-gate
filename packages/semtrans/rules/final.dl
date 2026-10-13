@@ -1,0 +1,35 @@
+// ============================================================================
+// The last node: the output columns in order under their wire names, then the
+// query's order and limit. Provenance of each column is published as `ocol`.
+// ============================================================================
+.decl lastnode(node:symbol)                    // the node the final SELECT reads
+.decl ocx(at:number, wire:symbol, internal:symbol)
+.decl ocolv(at:number, wire:symbol, role:symbol, member:symbol, modifier:symbol, vtype:symbol, grain:symbol)
+
+// dimensions, then metrics; modifier outputs (modifiers.dl) take 2000 + call * 100 + metric
+ocx(I, N, cat("d", to_string(I))) :- qd(I, N).
+ocx(1000 + I, N, cat("m", to_string(I))) :- qm(I, N).
+ocolv(I, N, "dimension", N, "", T, G) :- qd(I, N), dvtype(N, T), dgrain(N, G), !collapsed(N, _).
+ocolv(I, N, "dimension", N, "", T, "") :- qd(I, N), dvtype(N, T), !dgrain(N, _), !collapsed(N, _).
+ocolv(I, N, "dimension", N, "", "string", "") :- qd(I, N), collapsed(N, _).
+ocolv(1000 + I, N, "metric", N, "", T, "") :- qm(I, N), rcube(C), c_m_info(C, N, "value_type", T).
+ocolv(1000 + I, N, "metric", N, "", "number", "") :- qm(I, N), rcube(C), !c_m_info(C, N, "value_type", _).
+ocol(O, W, R, M, X, T, G) :- ocolv(O, W, R, M, X, T, G).
+
+node("final", 100000000) :- rcube(_).
+nfrom("final", N) :- lastnode(N).
+ncol("final", O, W, I) :- ocx(O, W, I).
+
+// order and limit last
+refusal("invalid_params", CAT3("order field '", F, "' is not an output column"), cat("output columns: ", L)) :-
+    q_order(_, F, _), !ocx(_, F, _), joined("ocols", L).
+refusal("invalid_params", CAT3("order direction '", D, "' is not asc or desc"), "") :- q_order(_, _, D), D != "asc", D != "desc".
+norder("final", I, CAT3(X, " ASC", " NULLS LAST")) :- q_order(I, F, "asc"), ocx(_, F, X).
+norder("final", I, CAT3(X, " DESC", " NULLS LAST")) :- q_order(I, F, "desc"), ocx(_, F, X).
+nlimit("final", N) :- q_limit(N), N >= 0.
+refusal("invalid_params", "limit must not be negative", "") :- q_limit(N), N < 0.
+item("ocols", O, W) :- ocx(O, W, _).
+// ClickHouse fills an unmatched LEFT JOIN with defaults unless told otherwise; a plan with a join asks for NULL
+.decl hasjoin(one:number)
+hasjoin(1) :- njoin(_, _, _).
+nsuffix("final", "SETTINGS join_use_nulls = 1") :- rcube(_), dia("clickhouse"), hasjoin(1).

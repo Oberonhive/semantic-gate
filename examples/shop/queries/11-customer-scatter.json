@@ -1,0 +1,2 @@
+{"metrics": ["orders", "revenue"], "dimensions": ["customer"], "limit": 500,
+ "order": [{"field": "revenue", "dir": "desc"}]}

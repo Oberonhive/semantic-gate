@@ -1,0 +1,9 @@
+{
+  "name": "@semantic-gate/contract",
+  "version": "0.0.0",
+  "description": "Types of the semantic-gate contract: query, metadata, response, provider protocol, errors.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" }
+}

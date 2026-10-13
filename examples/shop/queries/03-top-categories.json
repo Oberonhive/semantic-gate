@@ -1,0 +1,3 @@
+{"metrics": ["revenue", "orders"], "dimensions": ["category"],
+ "filters": {"field": "period", "op": "between", "value": ["2025-01-01", "2025-12-31"]},
+ "modifiers": [{"name": "topn", "params": {"by": "revenue", "n": 5, "universe": "post_filter", "rest": "collapse"}}]}

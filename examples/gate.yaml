@@ -1,0 +1,26 @@
+# The shop cube, written six ways, on one gate. Paths are relative to this file.
+#
+#   PATH=$PWD/node_modules/.bin:$PATH target/debug/semantic-gate serve --config examples/gate.yaml
+#
+# node_modules/.bin gives the gate semantic-gate-js, the provider it spawns for
+# semtrans and TypeScript cubes; shop-python needs `uv`. A namespace whose
+# provider cannot start is simply not ready (see /readyz); the rest keep serving.
+listen: {http: 127.0.0.1:7792}
+
+datasources:
+  shop:
+    kind: duckdb
+    tables:
+      orders: shop/data/orders.csv
+      customers: shop/data/customers.csv
+
+namespaces:
+  shop-yaml:       {cubes: shop/yaml,       datasource: shop, cors: {origins: ["http://127.0.0.1:8000"]}}
+  shop-datalog:    {cubes: shop/datalog,    datasource: shop, cors: {origins: ["http://127.0.0.1:8000"]}}
+  shop-metricflow: {cubes: shop/metricflow, datasource: shop, cors: {origins: ["http://127.0.0.1:8000"]}}
+  shop-cubedev:    {cubes: shop/cubedev,    datasource: shop, cors: {origins: ["http://127.0.0.1:8000"]}}
+  shop-typescript: {cubes: shop/typescript, datasource: shop, cors: {origins: ["http://127.0.0.1:8000"]}}
+  shop-python:     {cubes: shop/python,     datasource: shop, cors: {origins: ["http://127.0.0.1:8000"]}}
+
+listeners:
+  - {kind: pgwire, listen: 127.0.0.1:6543, namespace: shop-yaml}

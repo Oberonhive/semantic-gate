@@ -1,0 +1,40 @@
+Copyright (c) 2026 Andrey Porozhnetov (GitHub: Oberonhive). All rights reserved.
+
+PROPRIETARY SOFTWARE. PUBLISHED FOR VIEWING ONLY. NO LICENSE IS GRANTED.
+
+This repository, including its source code, documentation, examples, data
+and every other file in it (together, "the Software"), is the property of
+the copyright holder. Its publication does not place it in the public domain
+and grants no license or other right, by implication, estoppel or otherwise,
+except as stated below.
+
+Without the prior written permission of the copyright holder, you may not,
+in whole or in part:
+
+  1. use, run, install, deploy or host the Software;
+  2. copy or reproduce it, except as stated below;
+  3. modify, translate, adapt or create derivative works of it;
+  4. distribute, publish, sublicense, sell, rent, lease, lend or otherwise
+     make it available to anyone;
+  5. use it, or any part of it, to train, fine-tune or evaluate a
+     machine-learning model, or to build a product or service that competes
+     with it;
+  6. remove or alter this notice.
+
+The only rights granted are those the GitHub Terms of Service require for a
+public repository: to view the Software on GitHub and to fork it within
+GitHub. A fork grants no further right; this notice applies to every copy.
+
+Third-party dependencies named in the lock files are not part of the
+Software and are not distributed with it; each remains under its own
+license.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Requests for permission: https://github.com/Oberonhive

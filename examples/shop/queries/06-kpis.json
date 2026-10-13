@@ -1,0 +1,2 @@
+{"metrics": ["revenue", "orders", "aov", "margin_pct"],
+ "filters": {"field": "period", "op": ">=", "value": "2025-01-01"}}

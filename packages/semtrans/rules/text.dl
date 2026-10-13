@@ -1,0 +1,58 @@
+// ============================================================================
+// The only place the rules look inside a SQL fragment, and the only place a
+// list becomes text. No grammar: `{name}` holes are substituted once (a
+// substituted value is not rescanned), and an ordered `item` list is joined.
+// ============================================================================
+#define CAT3(a,b,c)       cat(a,cat(b,c))
+#define CAT4(a,b,c,d)     cat(a,CAT3(b,c,d))
+#define CAT5(a,b,c,d,e)   cat(a,CAT4(b,c,d,e))
+#define CAT6(a,b,c,d,e,f) cat(a,CAT5(b,c,d,e,f))
+#define CAT7(a,b,c,d,e,f,g) cat(a,CAT6(b,c,d,e,f,g))
+
+// ---- holes ------------------------------------------------------------------
+.decl scan(t:symbol)
+.decl tpos(t:symbol, i:number)
+.decl hole(t:symbol, i:number, len:number, name:symbol)
+.decl hrank(t:symbol, i:number, k:number)
+.decl nholes(t:symbol, n:number)
+
+tpos(T, 0) :- scan(T), strlen(T) > 0.
+tpos(T, I+1) :- tpos(T, I), I+1 < strlen(T).
+hole(T, I, J-I+1, substr(T, I+1, J-I-1)) :-
+    tpos(T, I), substr(T, I, 1) = "{",
+    J = min K : { tpos(T, K), substr(T, K, 1) = "}", K > I }.
+hrank(T, I, K) :- hole(T, I, _, _), K = count : { hole(T, J, _, _), J < I }.
+nholes(T, N) :- scan(T), N = count : { hole(T, _, _, _) }.
+
+// interp(Scope, Text, Out): Text with every hole filled from scope_val(Scope, name, value).
+// A hole with no value leaves interp underived; `unresolved` names it (outside the recursion).
+.decl interp_req(scope:symbol, t:symbol)
+.decl scope_val(scope:symbol, name:symbol, value:symbol)
+.decl iacc(scope:symbol, t:symbol, k:number, upto:number, acc:symbol)
+.decl interp(scope:symbol, t:symbol, out:symbol)
+.decl unresolved(scope:symbol, t:symbol, name:symbol)
+
+scan(T) :- interp_req(_, T).
+iacc(S, T, 0, 0, "") :- interp_req(S, T).
+iacc(S, T, K+1, I+L, CAT3(A, substr(T, P, I-P), V)) :-
+    iacc(S, T, K, P, A), hrank(T, I, K), hole(T, I, L, N), scope_val(S, N, V).
+interp(S, T, cat(A, substr(T, P, strlen(T)-P))) :- iacc(S, T, K, P, A), nholes(T, K).
+unresolved(S, T, N) :- interp_req(S, T), hole(T, _, _, N), !scope_val(S, N, _).
+
+// ---- ordered lists: item(Key, Seq, Text) → joined(Key, Text) -------------------
+// Separator: `jsep(Key, s)`, default ", ".
+.decl item(key:symbol, seq:number, text:symbol)
+.decl jsep(key:symbol, s:symbol)
+.decl has_item(key:symbol)
+.decl isep(key:symbol, s:symbol)
+.decl inext(key:symbol, o1:number, o2:number)
+.decl jacc(key:symbol, o:number, acc:symbol)
+.decl joined(key:symbol, text:symbol)
+
+has_item(K) :- item(K, _, _).
+isep(K, S) :- jsep(K, S).
+isep(K, ", ") :- has_item(K), !jsep(K, _).
+inext(K, O1, O2) :- item(K, O1, _), O2 = min O : { item(K, O, _), O > O1 }.
+jacc(K, O, T) :- item(K, O, T), O = min O2 : { item(K, O2, _) }.
+jacc(K, O2, CAT3(A, S, T)) :- jacc(K, O1, A), inext(K, O1, O2), item(K, O2, T), isep(K, S).
+joined(K, A) :- jacc(K, O, A), !inext(K, O, _).

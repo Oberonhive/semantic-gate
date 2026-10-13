@@ -1,0 +1,7 @@
+# The shop cube, authored as a free-form TypeScript provider: handwritten
+# DuckDB SQL, no modifiers (a partial vocabulary is legal). Same names as
+# ../yaml/shop.yaml, so a query without modifiers returns the same rows.
+contract: "0.1"
+module: cube.ts
+tables:
+  orders: ../data/orders.csv

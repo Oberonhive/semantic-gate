@@ -1,0 +1,34 @@
+// ============================================================================
+// SEAM 1 of 3 — the query in. `src/encode.ts` produces exactly these input
+// relations from a PlanParams; nothing else reaches the rules.
+//
+// Values come as text plus a type tag ("str" | "num" | "bool" | "null" |
+// "obj") and, where a value may land in SQL, its literal already rendered for
+// the dialect (quoted and escaped for strings). A value that is one element of
+// a JSON array has arr = 1; a scalar has arr = 0 and idx = 0.
+// ============================================================================
+.decl q_dialect(dialect:symbol)                          // "duckdb" | "clickhouse"
+.decl q_context(now:symbol, tz:symbol)                   // EvaluationContext
+.decl q_metric(i:number, name:symbol)                    // metrics, in query order
+.decl q_dim(i:number, name:symbol)                       // dimensions, in query order
+.decl q_fnode(id:number, kind:symbol, parent:number, idx:number)  // filter tree: and | or | not | pred; root parent = -1
+.decl q_fpred(id:number, field:symbol, op:symbol)
+.decl q_fval(id:number, idx:number, text:symbol, lit:symbol, type:symbol, arr:number)
+.decl q_mod(i:number, name:symbol)                       // modifiers, in call order
+.decl q_modp(i:number, param:symbol, idx:number, text:symbol, lit:symbol, type:symbol, arr:number)
+.decl q_param(key:symbol, idx:number, text:symbol, lit:symbol, type:symbol, arr:number)  // key: `param` or `member.param`
+.decl q_order(i:number, field:symbol, dir:symbol)
+.decl q_limit(n:number)
+
+.input q_dialect
+.input q_context
+.input q_metric
+.input q_dim
+.input q_fnode
+.input q_fpred
+.input q_fval
+.input q_mod
+.input q_modp
+.input q_param
+.input q_order
+.input q_limit
